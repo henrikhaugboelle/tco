@@ -2,6 +2,6 @@
 	"name": "raspberry-server",
 	"version": "0.0.1",
 	"dependencies": {
-		
+		"underscore": "x.x.x"
 	}
 }
