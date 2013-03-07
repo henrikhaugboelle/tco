@@ -8,9 +8,9 @@ var client;
 var args;
 
 var defaults = {
-	port: 3000,
 	server_ip: '127.0.0.1', // 10.25.229.223
 	client_ip: '127.0.0.1',
+	client_port: 3000,
 	type: 'udp4'
 };
 
@@ -22,7 +22,7 @@ var actions = {
 		console.log("send a message: " + msg);
 
 		var message = new Buffer(msg);
-		server.send(message, 0, message.length, args.port, args.client_ip, function(err, bytes) {
+		server.send(message, 0, message.length, 3000, "192.168.0.10", function(err, bytes) {
 			if (err) console.log(err);
 		});
 	}
@@ -31,13 +31,13 @@ var actions = {
 cli.on('arguments', function(_args) {
 	args = _.defaults(_args, defaults);
 
-	console.log(args);
+	// console.log(args);
 
 	server = dgram.createSocket(args.type);
 	server.bind();
 	server.setBroadcast(true);
 	server.setMulticastTTL(128);
-	// server.addMembership("localhost");
+	server.addMembership("192.168.0.10");
 
 	// server.on('message', function(msg, rinfo) {
 	// 	console.log("socket message");
@@ -57,29 +57,31 @@ cli.on('arguments', function(_args) {
 		console.log("server error");
 	});
 
-	client = dgram.createSocket(args.type);
-	client.bind(args.port, args.server_ip);
-	client.setBroadcast(true);
-	client.setMulticastTTL(128);
-	// client.addMembership('127.0.0.1', '127.0.0.1');
+	// client = dgram.createSocket(args.type);
+	// // client.bind(args.port, args.server_ip);
+	// // client.bind(args.port, args.client_ip);
+	// // client.bind(args.port);
+	// client.setBroadcast(true);
+	// client.setMulticastTTL(128);
+	// // client.addMembership('127.0.0.1', '127.0.0.1');
 
-	client.on('message', function(msg, rinfo) {
-		console.log("client message");
-		console.log(arguments);
-		console.log(msg.toString());
-	});
+	// client.on('message', function(msg, rinfo) {
+	// 	console.log("client message");
+	// 	console.log(arguments);
+	// 	console.log(msg.toString());
+	// });
 
-	client.on('listening', function() {
-		console.log("client start listening on " + client.address().address + ":" + client.address().port);
-	});
+	// client.on('listening', function() {
+	// 	console.log("client start listening on " + client.address().address + ":" + client.address().port);
+	// });
 
-	client.on('close', function() {
-		console.log("client stop listening on " + client.address().address + ":" + client.address().port);
-	});
+	// client.on('close', function() {
+	// 	console.log("client stop listening on " + client.address().address + ":" + client.address().port);
+	// });
 
-	client.on('error', function(err) {
-		console.log("client error");
-	});
+	// client.on('error', function(err) {
+	// 	console.log("client error");
+	// });
 });
 
 cli.on('input', function(input) {
