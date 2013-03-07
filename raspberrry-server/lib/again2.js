@@ -6,7 +6,7 @@ var broadcastAddress = '255.255.255.255';
 var broadcastPort = 41234;
  
 socket.bind(broadcastPort, '0.0.0.0');
-socket.setBroadcast(true);
+//socket.setBroadcast(true);
  
 socket.on("message", function ( data, rinfo ) {
 	console.log("Message received from ", rinfo.address, " : ", data.toString());
