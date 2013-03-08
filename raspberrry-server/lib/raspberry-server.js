@@ -47,10 +47,10 @@ socket_heartbeat.on('message', function(message, remote) {
 });
 
 setInterval(function() {
-	console.log("removing dead nodes");
+	// console.log("removing dead nodes");
 
 	for (var address in ticks) {
-		console.log(address + ": " + ticks[address] + " tick: " + tick);
+		// console.log(address + ": " + ticks[address] + " tick: " + tick);
 		if (ticks[address] < tick) {
 			console.log("node removed: " + address);
 			delete nodes[address];
