@@ -6,7 +6,18 @@ var broadcastAddress = '255.255.255.255';
 var broadcastPort = 41234;
  
 socket.bind(broadcastPort, '0.0.0.0');
-socket.setBroadcast(true);
+
+socket.on('listening', function() {
+	console.log("listening");
+	socket.setBroadcast(true);
+});
+
+socket.on('error', function() {
+	console.log("error");
+});
+socket.on('close', function() {
+	console.log("close");
+});
 
 var x = 0;
 setInterval(function () {
