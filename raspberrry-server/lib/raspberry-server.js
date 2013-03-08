@@ -19,7 +19,11 @@ var TIMEOUT_INTERVAL = 2000;
 var socket_heartbeat = dgram.createSocket('udp4');
 
 socket_heartbeat.bind(HEARTBEAT_PORT, '0.0.0.0');
-socket_heartbeat.setBroadcast(true);
+
+socket_heartbeat.on('listening', function() {
+	console.log("heartbeat listening start");
+	socket_heartbeat.setBroadcast(true);
+});
 
 socket_heartbeat.on('message', function(message, remote) {
 	console.log("heartbeat from: " + remote.address + ":" + remote.port);
@@ -35,7 +39,7 @@ socket_heartbeat.on('message', function(message, remote) {
 });
 
 setInterval(function() {
-	console.log("cleaning nodes");
+	console.log("removing dead nodes");
 
 	for (var address in ticks) {
 		console.log(address + ": " + ticks[address] + " tick: " + tick);

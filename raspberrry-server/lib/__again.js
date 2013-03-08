@@ -8,7 +8,6 @@ var broadcastPort = 41234;
 socket.bind(broadcastPort, '0.0.0.0');
 
 socket.on('listening', function() {
-	console.log("listening");
 	socket.setBroadcast(true);
 });
 
