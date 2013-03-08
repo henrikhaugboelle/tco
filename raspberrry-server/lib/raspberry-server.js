@@ -20,6 +20,13 @@ var socket_heartbeat = dgram.createSocket('udp4');
 
 socket_heartbeat.bind(HEARTBEAT_PORT, '0.0.0.0');
 
+// mac hack
+try {
+	socket_heartbeat.setBroadcast(true)
+} catch (e) {
+
+}
+
 socket_heartbeat.on('listening', function() {
 	console.log("heartbeat listening start");
 	socket_heartbeat.setBroadcast(true);
