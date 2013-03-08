@@ -2,7 +2,7 @@ var dgram = require('dgram');
 var socket = dgram.createSocket('udp4');
  
 var testMessage = "[hello world] pid: " + process.pid + " nounce: ";
-var broadcastAddress = '255.255.0.0';
+var broadcastAddress = '255.255.255.255';
 var broadcastPort = 41234;
  
 socket.bind(broadcastPort, '0.0.0.0');
