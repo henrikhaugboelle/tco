@@ -28,12 +28,12 @@ try {
 }
 
 socket_heartbeat.on('listening', function() {
-	// console.log("heartbeat listening start");
+	console.log("heartbeat listening start");
 	socket_heartbeat.setBroadcast(true);
 });
 
 socket_heartbeat.on('message', function(message, remote) {
-	console.log("heartbeat from: " + remote.address + ":" + remote.port);
+	// console.log("heartbeat from: " + remote.address + ":" + remote.port);
 
 	if (!nodes[remote.address]) {
 		console.log("node joined: "  + remote.address + ":" + remote.port);
