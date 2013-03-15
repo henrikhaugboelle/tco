@@ -1,3 +1,5 @@
+var os = require('os');
+
 var ipToInt = function(ip) {
 	var d = ip.split('.');
 
@@ -18,8 +20,8 @@ var Server = function Server(dgram) {
 
 	this.tick = 0;
 
-	this.isServer = false;
 	this.server = null;
+	this.local = null;
 
 	this.heartbeat_socket = this.dgram.createSocket('udp4');
 	this.heartbeat_socket.bind(this.HEARTBEAT_PORT, '0.0.0.0');
@@ -32,6 +34,22 @@ var Server = function Server(dgram) {
 	this.heartbeat_socket.on('listening', function() {
 		self.heartbeat_socket.setBroadcast(true);
 	});
+
+	// get own ip
+	var interfaces = os.networkInterfaces();
+	var addrs = [];
+
+	for (var x in interfaces) {
+		for (var i in interfaces[x]) {
+			var address = interfaces[x][i];
+
+			if (address.family == 'IPv4' && !address.internal) {
+				addrs.push(address.address)
+			}
+		}
+	}
+
+	this.local = addrs[0];
 };
 
 Server.prototype.print = function() {
@@ -42,6 +60,16 @@ Server.prototype.print = function() {
 			console.log(address);
 		}
 	}
+
+	if (this.isServer()) {
+		console.log("I am server (" + this.local + ")");
+	}
+
+	console.log("");
+};
+
+Server.prototype.isServer = function() {
+	return this.local === this.server;
 };
 
 Server.prototype.listenForHeartbeat = function() {
