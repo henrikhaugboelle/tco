@@ -40,7 +40,6 @@ Server.prototype.listenForHeartbeat = function() {
 	});
 
 	setInterval(function() {
-		console.log("check for timeouts");
 		for (var address in self.ticks) {
 			if (self.ticks[address] < self.tick) {
 				console.log("node removed: " + address);
