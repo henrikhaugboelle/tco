@@ -11,8 +11,8 @@ var Server = function Server(dgram) {
 
 	this.HEARTBEAT_ADDRESS = '255.255.255.255';
 	this.HEARTBEAT_PORT = 41234;
-	this.HEARTBEAT_INTERVAL = 500;
-	this.TIMEOUT_INTERVAL = 2000;
+	this.HEARTBEAT_INTERVAL = 50;
+	this.TIMEOUT_INTERVAL = 200;
 
 	this.nodes = {};
 
