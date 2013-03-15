@@ -1,7 +1,7 @@
 console.log("raspberry-server");
 
 var Server = require('./server'),
-	communication = require('./communication/local'),
+	communication = require('./dgramlocal'),
 	communication = require('dgram');
 
 var server = new Server(communication);
