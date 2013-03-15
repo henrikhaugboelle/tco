@@ -1,13 +1,69 @@
-console.log("raspberry-server");
 
-var Server = require('./server'),
-	communication = require('./communication/local'),
-	communication = require('dgram');
 
-var server = new Server(communication);
+var HEARTBEAT_ADDRESS = '255.255.255.255';
+var HEARTBEAT_PORT = 41234;
+var HEARTBEAT_INTERVAL = 500;
+var TIMEOUT_INTERVAL = 2000;
 
-server.listenForHeartbeat();
-server.startHeartbeat();
+var Server = function Server(dgram) {
+	this.dgram = dgram;
+	
+	this.socket = this.dgram.createSocket('udp4');
+	this.socket.bind(HEARTBEAT_PORT, '0.0.0.0');
+
+	this.nodes = {};
+	this.ticks = {};
+
+	this.tick = 0;
+};
+
+Server.prototype.listenForHeartbeat = function() {
+	var self = this;
+
+	// mac hack
+	try {
+		self.socket.setBroadcast(true)
+	} catch (e) { }
+
+	self.socket.on('listening', function() {
+		self.socket.setBroadcast(true);
+	});
+
+	self.socket.on('message', function(message, remote) {
+		if (!self.nodes[remote.address]) {
+			console.log("node joined: "  + remote.address + ":" + remote.port);
+			self.nodes[remote.address] = { 
+				address: remote.address,
+				port: remote.port
+			};
+		}
+	});
+
+	setInterval(function() {
+		for (var address in self.ticks) {
+			if (self.ticks[address] < self.tick) {
+				console.log("node removed: " + address);
+				delete self.nodes[address];
+				delete self.ticks[address];
+			}
+		}
+
+		self.tick++;
+	}, TIMEOUT_INTERVAL);
+};
+
+Server.prototype.startHeartbeat = function() {
+	var self = this;
+
+	setInterval(function() {
+		var buf = new Buffer("heartbeat");
+		self.socket.send(buf, 0, buf.length, HEARTBEAT_PORT, HEARTBEAT_ADDRESS, function(err) {
+			if (err) console.log(err);
+		});
+	}, HEARTBEAT_INTERVAL);
+};
+
+module.exports = Server;
 
 // console.log("server");
 
