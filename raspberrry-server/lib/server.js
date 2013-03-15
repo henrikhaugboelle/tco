@@ -50,7 +50,7 @@ Server.prototype.listenForHeartbeat = function() {
 	// listen for heartbeats
 	self.heartbeat_socket.on('message', function(message, remote) {
 		if (self.nodes[remote.address] === undefined) {
-			console.log("node joined: "  + remote.address);
+			// console.log("node joined: "  + remote.address);
 
 			self.nodes[remote.address] = self.tick;
 			self.chooseServer();
@@ -63,7 +63,7 @@ Server.prototype.listenForHeartbeat = function() {
 	setInterval(function() {
 		for (var address in self.nodes) {
 			if (self.nodes[address] < self.tick) {
-				console.log("node removed: " + address);
+				// console.log("node removed: " + address);
 
 				delete self.nodes[address];
 
@@ -80,9 +80,6 @@ Server.prototype.chooseServer = function() {
 	var max = 0,
 		addr = null;
 
-	console.log("before: ");
-	this.print();
-
 	for (var address in self.nodes) {
 		var ip = ipToInt(address);
 
@@ -94,7 +91,6 @@ Server.prototype.chooseServer = function() {
 
 	this.server = addr;
 
-	console.log("after: ");
 	this.print();
 };
 
