@@ -22,6 +22,7 @@ var Server = function Server(dgram) {
 	this.SIGNAL_RAW_PORT = 41000;
 	this.SIGNAL_RAW_INTERVAL = 1000;
 
+	this.SIGNAL_PROCESSED_ADDRESS = '255.255.255.255';
 	this.SIGNAL_PROCESSED_PORT = 42000;
 	this.SIGNAL_PROCESSED_THRESHOLD = 10;
 
@@ -175,7 +176,7 @@ Server.prototype.listenForRawSignal = function() {
 
 			var buf = new Buffer(sum + "");
 
-			self.signal_processed_socket.send(buf, 0, buf.length, self.SIGNAL_PROCESSED_PORT, self.server, function(err) {
+			self.signal_processed_socket.send(buf, 0, buf.length, self.SIGNAL_PROCESSED_PORT, self.SIGNAL_PROCESSED_ADDRESS, function(err) {
 				if (err) console.log(err);
 			});
 		}
