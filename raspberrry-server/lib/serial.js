@@ -20,11 +20,11 @@ var Serial = function Serial() {
 	this.flowControl = false;
 
 	this.serial = new SerialPort(this.path, {
-		baudrate: this.baudrate,
-		dataBits: this.dataBits,
-		parity: this.parity,
-		stopBits: this.stopBits,
-		flowControl: this.flowControl
+		baudrate: self.baudrate,
+		dataBits: self.dataBits,
+		parity: self.parity,
+		stopBits: self.stopBits,
+		flowControl: self.flowControl
 	});
 
 	this.serial.on('open', function() {
@@ -64,8 +64,14 @@ Serial.prototype.listen = function() {
 					self.buffer.copy(tempBuffer, 0, 0, self.index);
 					self.index = 0;
 
+					var values = [];
+
+					for (var x = 0; x < tempBuffer.length; x++) {
+						values.push(tempBuffer.readUInt8(x));
+					}					
+
 					for (var x in (self.callbacks['message'] || [])) {
-						self.callbacks['message'][x].call(self, tempBuffer);
+						self.callbacks['message'][x].call(self, values);
 					}
 				} else {
 					self.buffer[self.index++] = input;
@@ -75,35 +81,40 @@ Serial.prototype.listen = function() {
 	});
 };
 
-Serial.prototype.write = function(message) {
+Serial.prototype.write = function(values) {
 	var self = this;
 
 	if (this.ready) {
-		while (message.length > 0) {
-			var character = message.pop();
+		while (values.length > 0) {
+			var character = values.shift();
+			console.log(character);
 
-			if (character === ESCAPE) {
-				this.serial.write(ESCAPE, function(err, results) {
+			if (character == ESCAPE) {
+				console.log("escape");
+				this.serial.write(String.fromCharCode(ESCAPE), function(err, results) {
 					if (err) console.log(err);
 				});
-				this.serial.write(ESCAPEINV, function(err, results) {
+				this.serial.write(String.fromCharCode(ESCAPEINV), function(err, results) {
 					if (err) console.log(err);
 				});
-			} else if (character === BOUNDARY) {
-				this.serial.write(ESCAPE, function(err, results) {
+			} else if (character == BOUNDARY) {
+				console.log("boundary");
+				this.serial.write(String.fromCharCode(ESCAPE), function(err, results) {
 					if (err) console.log(err);
 				});
-				this.serial.write(BOUNDARYINV, function(err, results) {
+				this.serial.write(String.fromCharCode(BOUNDARYINV), function(err, results) {
 					if (err) console.log(err);
 				});
 			} else {
-				this.serial.write(character, function(err, results) {
+				console.log(String.fromCharCode(character));
+				this.serial.write(String.fromCharCode(character), function(err, results) {
 					if (err) console.log(err);
 				});
 			}
 		}
 
-		this.serial.write(BOUNDARY, function(err, results) {
+console.log(String.fromCharCode(BOUNDARY));
+		this.serial.write(String.fromCharCode(BOUNDARY), function(err, results) {
 			if (err) console.log(err);
 		});
 	}
@@ -117,7 +128,7 @@ Serial.prototype.on = function(namespace, callback) {
 	this.callbacks[namespace].push(callback);
 };
 
-module.exports = SerialPort;
+module.exports = Serial;
 
 // var sys = require('sys'),
 // repl = require('repl'),

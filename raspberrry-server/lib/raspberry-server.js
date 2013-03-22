@@ -3,9 +3,22 @@ console.log("raspberry-server");
 var NetworkNode = require('./networknode'),
 	Serial = require('./serial');
 
+var serial = new Serial();
+
+serial.listen();
+
+serial.on('message', function(values) {
+	console.log(values);
+});
+
+//var interval = setInterval(function() {
+//	console.log("sending 1 and 2");
+//	serial.write([49, 50]);
+//}, 1000);
+
 var nn = new NetworkNode();
 
-nn.listen();
+//nn.listen();
 
 var threshold = 10;
 var received = [];
