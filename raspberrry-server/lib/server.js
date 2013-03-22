@@ -12,6 +12,11 @@ var ipToInt = function(ip) {
 var Server = function Server(dgram) {
 	var self = this;
 
+	this.callbacks = {
+		raw: [],
+		processed: []
+	};
+
 	this.dgram = dgram;
 
 	this.HEARTBEAT_ADDRESS = '255.255.255.255';
@@ -24,7 +29,6 @@ var Server = function Server(dgram) {
 
 	this.SIGNAL_PROCESSED_ADDRESS = '255.255.255.255';
 	this.SIGNAL_PROCESSED_PORT = 42000;
-	this.SIGNAL_PROCESSED_THRESHOLD = 10;
 
 	this.nodes = {};
 
@@ -32,8 +36,6 @@ var Server = function Server(dgram) {
 
 	this.server = null;
 	this.local = null;
-
-	self.received = [];
 
 	this.heartbeat_socket = null;
 	this.signal_raw_socket = null;
@@ -169,44 +171,41 @@ Server.prototype.listenForRawSignal = function() {
 	var self = this;
 
 	self.signal_raw_socket.on('message', function(message, remote) {
-		console.log("raw signal: " + remote.address + ":" + remote.port + " = " + message);
-
-		self.received.push(message);
-
-		if (self.received.length === self.SIGNAL_PROCESSED_THRESHOLD) {
-			var sum = 0;
-			while (self.received.length > 0) {
-				sum += parseInt(self.received.pop(), 10);
-			}
-
-			var buf = new Buffer(sum + "");
-
-			self.signal_processed_socket.send(buf, 0, buf.length, self.SIGNAL_PROCESSED_PORT, self.SIGNAL_PROCESSED_ADDRESS, function(err) {
-				if (err) console.log(err);
-			});
+		for (var x in self.callbacks.processed) {
+			self.callbacks.raw[x].call(self, message, remote);
 		}
 	});
-};
-
-Server.prototype.startRawSignal = function() {
-	var self = this;
-
-	setInterval(function() {
-		var number = Math.floor(Math.random()*11);
-		var buf = new Buffer(number + "");
-
-		self.signal_raw_socket.send(buf, 0, buf.length, self.SIGNAL_RAW_PORT, self.server, function(err) {
-			if (err) console.log(err);
-		});
-	}, self.SIGNAL_RAW_INTERVAL);
 };
 
 Server.prototype.listenForProcessedSignal = function() {
 	var self = this;
 
 	self.signal_processed_socket.on('message', function(message, remote) {
-		console.log("processed signal: " + remote.address + ":" + remote.port + " = " + message);
+		for (var x in self.callbacks.processed) {
+			self.callbacks.processed[x].call(self, message, remote);
+		}
 	});
+};
+
+Server.prototype.sendRawSignal = function(message) {
+	var buf = Buffer(message + "");
+	this.signal_raw_socket.send(buf, 0, buf.length, this.SIGNAL_RAW_PORT, this.server, function(err) {
+		if (err) console.log(err);
+	});
+};
+Server.prototype.sendProcessedSignal = function(message) {
+	var buf = Buffer(message + "");
+	this.signal_processed_socket.send(buf, 0, buf.length, this.SIGNAL_PROCESSED_PORT, this.SIGNAL_PROCESSED_ADDRESS, function(err) {
+		if (err) console.log(err);
+	});
+};
+
+Server.prototype.onRawSignal = function(callback) {
+	this.callbacks.raw.push(callback);
+};
+
+Server.prototype.onProcessedSignal = function(callback) {
+	this.callbacks.processed.push(callback);
 };
 
 module.exports = Server;
