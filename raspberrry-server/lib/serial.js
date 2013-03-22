@@ -87,7 +87,6 @@ Serial.prototype.write = function(values) {
 	if (this.ready) {
 		while (values.length > 0) {
 			var character = values.shift();
-			console.log(character);
 
 			if (character == ESCAPE) {
 				console.log("escape");
@@ -106,14 +105,12 @@ Serial.prototype.write = function(values) {
 					if (err) console.log(err);
 				});
 			} else {
-				console.log(String.fromCharCode(character));
 				this.serial.write(String.fromCharCode(character), function(err, results) {
 					if (err) console.log(err);
 				});
 			}
 		}
 
-console.log(String.fromCharCode(BOUNDARY));
 		this.serial.write(String.fromCharCode(BOUNDARY), function(err, results) {
 			if (err) console.log(err);
 		});

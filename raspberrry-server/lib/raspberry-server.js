@@ -18,28 +18,34 @@ serial.on('message', function(values) {
 
 var nn = new NetworkNode();
 
-//nn.listen();
+nn.listen();
 
 var threshold = 10;
 var received = [];
 
+serial.on('message', function(values) {
+	nn.sendMessageToServer(values.join(","));
+});
+
 nn.on('clientMessage', function(message, remote) {
 	console.log("message from client: " + remote.address + ":" + remote.port + " = " + message);
 	
-	received.push(message);
+nn.sendMessageToClients(message);
+	//received.push(message);
 
-	if (received.length === threshold) {
-		var sum = 0;
-		while (received.length > 0) {
-			sum += parseInt(received.pop(), 10);
-		}
+	//if (received.length === threshold) {
+	//	var sum = 0;
+	//	while (received.length > 0) {
+	//		sum += parseInt(received.pop(), 10);
+	//	}
 
-		nn.sendMessageToClients(sum);
-	}
+	//	nn.sendMessageToClients(sum);
+	//}
 });
 
 nn.on('serverMessage', function(message, remote) {
 	console.log(">> message from server: " + remote.address + ":" + remote.port + " = " + message);
+	serial.write((message+"").split(','));
 });
 
 nn.on('promoted', function() {
@@ -58,7 +64,12 @@ nn.on('removed', function(ip) {
 	console.log("A server was removed (" + ip + ")");
 });
 
+//setInterval(function() {
+//	var number = Math.floor(Math.random()*11);
+//	nn.sendMessageToServer(number);
+//}, 1000);
+
 setInterval(function() {
-	var number = Math.floor(Math.random()*11);
-	nn.sendMessageToServer(number);
+	console.log("...");
+	nn.sendMessageToClients("50");
 }, 1000);
