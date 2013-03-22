@@ -14,10 +14,14 @@ var callback = function(message){
 	console.log(message);
 	console.log(message.toString());
 };
-var bufferSize = 10;
+var bufferSize = 255;
 var buffer = new Buffer(bufferSize);
 var index = 0;
 var nextEscaped = false;
+var ESCAPE = 125;
+var BOUNDARY = 126;
+var ESCAPEINV = 93;
+var BOUNDARYINV = 94;
 serial.on('data', function(chuck){
 	var length = chuck.length;
 	var i = 0;
@@ -26,18 +30,18 @@ serial.on('data', function(chuck){
 		var input = chuck.readUInt8(i++);
 
 		if(nextEscaped){
-			if(input == 93){
-				buffer[index++] = 125; // ++
-			}else if(input == 94){
-				buffer[index++] = 126; //++
+			if(input == ESCAPEINV){
+				buffer[index++] = ESCAPE;
+			}else if(input == BOUNDARYINV){
+				buffer[index++] = BOUNDARY;
 			}
 			// could be that input is not 93 or 94, which is an error
 			nextEscaped = false;
 		}
-		else if(input == 125){
+		else if(input == ESCAPE){
 			nextEscaped = true;
 		}
-		else if(input==126){
+		else if(input == BOUNDARY){
 			var tempBuffer = new Buffer(index);
 			buffer.copy(tempBuffer, 0, 0, index);
 			callback.call(this, tempBuffer);
