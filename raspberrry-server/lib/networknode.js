@@ -1,4 +1,5 @@
-var os = require('os');
+var os = require('os'),
+	dgram = require('dgram');
 
 var ipToInt = function(ip) {
 	var d = ip.split('.');
@@ -6,22 +7,24 @@ var ipToInt = function(ip) {
 	return ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
 };
 
-var Server = function Server(dgram) {
+var NetworkNode = function NetworkNode(options) {
 	var self = this;
 
+	options = options || {};
+
+	this.dgram = options.dgram || dgram;
+
+	this.HEARTBEAT_ADDRESS = options.heartbeat_address || '255.255.255.255';
+	this.HEARTBEAT_PORT = options.heartbeat_port || 40000;
+	this.HEARTBEAT_INTERVAL = options.heartbeat_interval || 50;
+	this.HEARTBEAT_TIMEOUT_INTERVAL = options.heartbeat_timeout_interval || 200;
+
+	this.SERVER_PORT = options.server_port || 41000;
+
+	this.CLIENT_ADDRESS = options.client_address || '255.255.255.255';
+	this.CLIENT_PORT = options.client_port || 42000;
+
 	this.callbacks = {};
-
-	this.dgram = dgram;
-
-	this.HEARTBEAT_ADDRESS = '255.255.255.255';
-	this.HEARTBEAT_PORT = 40000;
-	this.HEARTBEAT_INTERVAL = 50;
-	this.HEARTBEAT_TIMEOUT_INTERVAL = 200;
-
-	this.SERVER_PORT = 41000;
-
-	this.CLIENT_ADDRESS = '255.255.255.255';
-	this.CLIENT_PORT = 42000;
 
 	this.nodes = {};
 
@@ -72,7 +75,7 @@ var Server = function Server(dgram) {
 	this.local = this.ip = addrs[0];
 };
 
-Server.prototype.print = function() {
+NetworkNode.prototype.print = function() {
 	for (var address in this.nodes) {
 		if (this.server === address) {
 			console.log(address + " <--");
@@ -84,15 +87,15 @@ Server.prototype.print = function() {
 	console.log("");
 };
 
-Server.prototype.listen = function() {
-	this.listenForHeartbeat();
+NetworkNode.prototype.listen = function() {
+	this.listenOnHeartbeat();
 	this.listenOnServer();
 	this.listenOnClient();
 
 	this.startHeartbeat();
 };
 
-Server.prototype.listenForHeartbeat = function() {
+NetworkNode.prototype.listenOnHeartbeat = function() {
 	var self = this;
 
 	// listen for heartbeats
@@ -129,7 +132,7 @@ Server.prototype.listenForHeartbeat = function() {
 };
 
 // signal from clients
-Server.prototype.listenOnClient = function() {
+NetworkNode.prototype.listenOnClient = function() {
 	var self = this;
 
 	self.server_socket.on('message', function(message, remote) {
@@ -140,7 +143,7 @@ Server.prototype.listenOnClient = function() {
 };
 
 // signal from server
-Server.prototype.listenOnServer = function() {
+NetworkNode.prototype.listenOnServer = function() {
 	var self = this;
 
 	self.client_socket.on('message', function(message, remote) {
@@ -150,7 +153,7 @@ Server.prototype.listenOnServer = function() {
 	});
 };
 
-Server.prototype.startHeartbeat = function() {
+NetworkNode.prototype.startHeartbeat = function() {
 	var self = this;
 
 	// emit heartbeats
@@ -162,11 +165,11 @@ Server.prototype.startHeartbeat = function() {
 	}, self.HEARTBEAT_INTERVAL);
 };
 
-Server.prototype.isServer = function() {
+NetworkNode.prototype.isServer = function() {
 	return this.local === this.server;
 };
 
-Server.prototype.chooseServer = function() {
+NetworkNode.prototype.chooseServer = function() {
 	var self = this,
 		max = 0,
 		addr = null,
@@ -194,12 +197,10 @@ Server.prototype.chooseServer = function() {
 			self.callbacks['demoted'][x].call(self);
 		}
 	}
-
-	this.print();
 };
 
 // sendMessageToServer
-Server.prototype.sendMessageToServer = function(message) {
+NetworkNode.prototype.sendMessageToServer = function(message) {
 	var buf = Buffer(message + "");
 	this.server_socket.send(buf, 0, buf.length, this.SERVER_PORT, this.server, function(err) {
 		if (err) console.log(err);
@@ -207,14 +208,14 @@ Server.prototype.sendMessageToServer = function(message) {
 };
 
 // sendMessageToClients
-Server.prototype.sendMessageToClients = function(message) {
+NetworkNode.prototype.sendMessageToClients = function(message) {
 	var buf = Buffer(message + "");
 	this.client_socket.send(buf, 0, buf.length, this.CLIENT_PORT, this.CLIENT_ADDRESS, function(err) {
 		if (err) console.log(err);
 	});
 };
 
-Server.prototype.on = function(namespace, callback) {
+NetworkNode.prototype.on = function(namespace, callback) {
 	if (!this.callbacks[namespace]) {
 		this.callbacks[namespace] = [];
 	}
@@ -222,4 +223,4 @@ Server.prototype.on = function(namespace, callback) {
 	this.callbacks[namespace].push(callback);
 };
 
-module.exports = Server;
+module.exports = NetworkNode;
