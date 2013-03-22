@@ -9,5 +9,7 @@ var server = new Server(communication);
 server.listenForHeartbeat();
 server.startHeartbeat();
 
-server.listenForSignal();
-server.startSignal();
+server.listenForRawSignal();
+server.startRawSignal();
+
+server.listenForProcessedSignal();

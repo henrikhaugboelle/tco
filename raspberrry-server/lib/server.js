@@ -6,18 +6,24 @@ var ipToInt = function(ip) {
 	return ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
 };
 
+// RAW: The signal that clients sends to the server (from sensors)
+// PROCESSED: The signal that the server sends to clients (to trigger output hardware)
+
 var Server = function Server(dgram) {
 	var self = this;
 
 	this.dgram = dgram;
 
 	this.HEARTBEAT_ADDRESS = '255.255.255.255';
-	this.HEARTBEAT_PORT = 41234;
+	this.HEARTBEAT_PORT = 40000;
 	this.HEARTBEAT_INTERVAL = 50;
 	this.HEARTBEAT_TIMEOUT_INTERVAL = 200;
 
-	this.SIGNAL_PORT = 49123;
-	this.SIGNAL_INTERVAL = 1000;
+	this.SIGNAL_RAW_PORT = 41000;
+	this.SIGNAL_RAW_INTERVAL = 1000;
+
+	this.SIGNAL_PROCESSED_PORT = 42000;
+	this.SIGNAL_PROCESSED_THRESHOLD = 10;
 
 	this.nodes = {};
 
@@ -27,21 +33,30 @@ var Server = function Server(dgram) {
 	this.local = null;
 
 	this.heartbeat_socket = null;
-	this.signal_socket = null;
+	this.signal_raw_socket = null;
+	this.signal_processed_socket = null;
 
 	this.heartbeat_socket = this.dgram.createSocket('udp4');
 	this.heartbeat_socket.bind(this.HEARTBEAT_PORT, '0.0.0.0');
 
-	this.signal_socket = this.dgram.createSocket('udp4');
-	this.signal_socket.bind(this.SIGNAL_PORT, '0.0.0.0');
+	this.signal_raw_socket = this.dgram.createSocket('udp4');
+	this.signal_raw_socket.bind(this.SIGNAL_RAW_PORT, '0.0.0.0');
+
+	this.signal_processed_socket = this.dgram.createSocket('udp4');
+	this.signal_processed_socket.bind(this.SIGNAL_PROCESSED_PORT, '0.0.0.0');
 
 	// mac hack
 	try {
 		this.heartbeat_socket.setBroadcast(true);
+		this.signal_processed_socket.setBroadcast(true);
 	} catch (e) { }
 
 	this.heartbeat_socket.on('listening', function() {
 		self.heartbeat_socket.setBroadcast(true);
+	});
+
+	this.signal_processed_socket.on('listening', function() {
+		self.signal_processed_socket.setBroadcast(true);
 	});
 
 	// get own ip
@@ -143,25 +158,49 @@ Server.prototype.chooseServer = function() {
 	this.print();
 };
 
-Server.prototype.listenForSignal = function() {
+Server.prototype.listenForRawSignal = function() {
 	var self = this;
 
-	self.signal_socket.on('message', function(message, remote) {
-		console.log("signal from: " + remote.address + ":" + remote.port);
+	var received = [];
+	self.signal_raw_socket.on('message', function(message, remote) {
+		console.log("raw signal: " + remote.address + ":" + remote.port + " = " + message);
+
+		received.push(message);
+
+		if (received.length === self.SIGNAL_PROCESSED_THRESHOLD) {
+			var sum = 0;
+			while (received.length > 0) {
+				sum += parseInt(received.pop(), 10);
+			}
+
+			var buf = new Buffer(sum + "");
+
+			self.signal_processed_socket.send(buf, 0, buf.length, self.SIGNAL_PROCESSED_PORT, self.server, function(err) {
+				if (err) console.log(err);
+			});
+		}
 	});
 };
 
-Server.prototype.startSignal = function() {
+Server.prototype.startRawSignal = function() {
 	var self = this;
 
 	setInterval(function() {
-		var buf = new Buffer("signal");
-		self.signal_socket.send(buf, 0, buf.length, self.SIGNAL_PORT, self.server, function(err) {
+		var number = Math.floor(Math.random()*11);
+		var buf = new Buffer(number + "");
+
+		self.signal_raw_socket.send(buf, 0, buf.length, self.SIGNAL_RAW_PORT, self.server, function(err) {
 			if (err) console.log(err);
 		});
-	}, self.SIGNAL_INTERVAL);
+	}, self.SIGNAL_RAW_INTERVAL);
+};
 
+Server.prototype.listenForProcessedSignal = function() {
+	var self = this;
 
+	self.signal_processed_socket.on('message', function(message, remote) {
+		console.log("processed signal: " + remote.address + ":" + remote.port + " = " + message);
+	});
 };
 
 module.exports = Server;
