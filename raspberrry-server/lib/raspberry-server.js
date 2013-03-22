@@ -1,8 +1,9 @@
 console.log("raspberry-server");
 
-var NetworkNode = require('./networknode');
-var nn = new NetworkNode();
+var NetworkNode = require('./networknode'),
+	Serial = require('./serial');
 
+var nn = new NetworkNode();
 
 nn.listen();
 
