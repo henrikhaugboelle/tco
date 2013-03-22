@@ -58,6 +58,24 @@ stdin.on('data', function(chunk){
 	serial.write(chunk);
 });
 
+void writeSerial(QueueList <int> message){
+  while (!message.isEmpty ()){
+    int character = message.pop();
+    if(character == ESCAPE){
+      Serial.write(ESCAPE);
+      Serial.write(ESCAPEINV);
+    }
+    else if(character == BOUNDARY){
+      Serial.write(ESCAPE);
+      Serial.write(BOUNDARYINV);
+    }
+    else{
+      Serial.write(character);
+    }
+  }
+  Serial.write(BOUNDARY);
+}
+
 
 repl.start("=>");
 

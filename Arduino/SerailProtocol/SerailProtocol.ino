@@ -1,23 +1,31 @@
 #include <QueueList.h>
 
 QueueList <int> que;
-boolean nextEscaped;
-int ESCAPE;
-int BOUNDARY;
-int ESCAPEINV;
-int BOUNDARYINV ;
-
+boolean nextEscaped = false;
+int ESCAPE = 125;
+int BOUNDARY = 126;
+int ESCAPEINV = 93;
+int BOUNDARYINV = 94;
+int timer = 0;
+const int groundPin = 8;
+const int powerPin = 9;
+const int xPin = A1;
+const int yPin = A2;
+const int zPin = A3;
+const int ledPin = 10;
 
 void setup(){
-  ESCAPE = 125;
-  BOUNDARY = 126;
-  ESCAPEINV = 93;
-  BOUNDARYINV = 94;
-  nextEscaped = false; 
   Serial.begin(9600);
+  pinMode(groundPin, OUTPUT);
+  pinMode(powerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(groundPin, LOW); 
+  digitalWrite(powerPin, HIGH);
 }
 
-void loop(){
+// Returns true if the queue contains a complete message
+// Remember to empty the queue!!!
+boolean readSerial(){
   while(Serial.available() > 0)
   {
     int input = Serial.read();
@@ -35,17 +43,53 @@ void loop(){
       nextEscaped = true;
     }
     else if(input == BOUNDARY){
-      echo();
+      return true;
     }
     else{
       que.push(input);
     }
   }
+  return false;
 }
 
-void echo(){
-  while (!que.isEmpty ()){
-    Serial.write (que.pop ());
+void writeSerial(QueueList <int> message){
+  while (!message.isEmpty ()){
+    int character = message.pop();
+    if(character == ESCAPE){
+      Serial.write(ESCAPE);
+      Serial.write(ESCAPEINV);
+    }
+    else if(character == BOUNDARY){
+      Serial.write(ESCAPE);
+      Serial.write(BOUNDARYINV);
+    }
+    else{
+      Serial.write(character);
+    }
   }
   Serial.write(BOUNDARY);
 }
+
+void echo(){
+  writeSerial(que);
+}
+
+void loop(){
+  if(readSerial()){
+    // set global state
+    while (!que.isEmpty ()){ ////////////////77
+      analogWrite(ledPin, que.pop()); /////////////77
+    }
+  }
+  if(timer > 10000){
+    QueueList <int> message;
+    int x = analogRead(xPin);
+    int y = analogRead(yPin);
+    int z = analogRead(zPin);
+    message.push(x);
+    writeSerial(message);
+    timer = 0;
+  }
+  timer++;
+}
+
