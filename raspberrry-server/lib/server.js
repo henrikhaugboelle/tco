@@ -32,7 +32,7 @@ var Server = function Server(dgram) {
 
 	this.server = null;
 	this.local = null;
-	
+
 	self.received = [];
 
 	this.heartbeat_socket = null;
@@ -173,7 +173,7 @@ Server.prototype.listenForRawSignal = function() {
 
 		self.received.push(message);
 
-		if (received.length === self.SIGNAL_PROCESSED_THRESHOLD) {
+		if (self.received.length === self.SIGNAL_PROCESSED_THRESHOLD) {
 			var sum = 0;
 			while (self.received.length > 0) {
 				sum += parseInt(self.received.pop(), 10);
