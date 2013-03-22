@@ -7,22 +7,24 @@ var ipToInt = function(ip) {
 	return ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
 };
 
-var NetworkNode = function NetworkNode() {
+var NetworkNode = function NetworkNode(options) {
 	var self = this;
 
+	options = options || {};
+
+	this.dgram = options.dgram || dgram;
+
+	this.HEARTBEAT_ADDRESS = options.heartbeat_address || '255.255.255.255';
+	this.HEARTBEAT_PORT = options.heartbeat_port || 40000;
+	this.HEARTBEAT_INTERVAL = options.heartbeat_interval || 50;
+	this.HEARTBEAT_TIMEOUT_INTERVAL = options.heartbeat_timeout_interval || 200;
+
+	this.SERVER_PORT = options.server_port || 41000;
+
+	this.CLIENT_ADDRESS = options.client_address || '255.255.255.255';
+	this.CLIENT_PORT = options.client_port || 42000;
+
 	this.callbacks = {};
-
-	this.dgram = dgram;
-
-	this.HEARTBEAT_ADDRESS = '255.255.255.255';
-	this.HEARTBEAT_PORT = 40000;
-	this.HEARTBEAT_INTERVAL = 50;
-	this.HEARTBEAT_TIMEOUT_INTERVAL = 200;
-
-	this.SERVER_PORT = 41000;
-
-	this.CLIENT_ADDRESS = '255.255.255.255';
-	this.CLIENT_PORT = 42000;
 
 	this.nodes = {};
 
@@ -86,14 +88,14 @@ NetworkNode.prototype.print = function() {
 };
 
 NetworkNode.prototype.listen = function() {
-	this.listenForHeartbeat();
+	this.listenOnHeartbeat();
 	this.listenOnServer();
 	this.listenOnClient();
 
 	this.startHeartbeat();
 };
 
-NetworkNode.prototype.listenForHeartbeat = function() {
+NetworkNode.prototype.listenOnHeartbeat = function() {
 	var self = this;
 
 	// listen for heartbeats

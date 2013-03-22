@@ -3,6 +3,7 @@ console.log("raspberry-server");
 var NetworkNode = require('./networknode');
 var nn = new NetworkNode();
 
+
 nn.listen();
 
 var threshold = 10;
