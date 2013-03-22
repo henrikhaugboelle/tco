@@ -199,4 +199,3 @@ module.exports = SerialPort;
 
 
 // repl.start("=>");
-
