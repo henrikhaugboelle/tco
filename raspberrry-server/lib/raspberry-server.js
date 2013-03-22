@@ -8,3 +8,6 @@ var server = new Server(communication);
 
 server.listenForHeartbeat();
 server.startHeartbeat();
+
+server.listenForSignal();
+server.startSignal();

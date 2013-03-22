@@ -14,7 +14,10 @@ var Server = function Server(dgram) {
 	this.HEARTBEAT_ADDRESS = '255.255.255.255';
 	this.HEARTBEAT_PORT = 41234;
 	this.HEARTBEAT_INTERVAL = 50;
-	this.TIMEOUT_INTERVAL = 200;
+	this.HEARTBEAT_TIMEOUT_INTERVAL = 200;
+
+	this.SIGNAL_PORT = 49123;
+	this.SIGNAL_INTERVAL = 1000;
 
 	this.nodes = {};
 
@@ -23,12 +26,18 @@ var Server = function Server(dgram) {
 	this.server = null;
 	this.local = null;
 
+	this.heartbeat_socket = null;
+	this.signal_socket = null;
+
 	this.heartbeat_socket = this.dgram.createSocket('udp4');
 	this.heartbeat_socket.bind(this.HEARTBEAT_PORT, '0.0.0.0');
 
+	this.signal_socket = this.dgram.createSocket('udp4');
+	this.signal_socket.bind(this.SIGNAL_PORT, '0.0.0.0');
+
 	// mac hack
 	try {
-		this.heartbeat_socket.setBroadcast(true)
+		this.heartbeat_socket.setBroadcast(true);
 	} catch (e) { }
 
 	this.heartbeat_socket.on('listening', function() {
@@ -68,10 +77,6 @@ Server.prototype.print = function() {
 	console.log("");
 };
 
-Server.prototype.isServer = function() {
-	return this.local === this.server;
-};
-
 Server.prototype.listenForHeartbeat = function() {
 	var self = this;
 
@@ -100,7 +105,23 @@ Server.prototype.listenForHeartbeat = function() {
 		}
 
 		self.tick++;
-	}, self.TIMEOUT_INTERVAL);
+	}, self.HEARTBEAT_TIMEOUT_INTERVAL);
+};
+
+Server.prototype.startHeartbeat = function() {
+	var self = this;
+
+	// emit heartbeats
+	setInterval(function() {
+		var buf = new Buffer("heartbeat");
+		self.heartbeat_socket.send(buf, 0, buf.length, self.HEARTBEAT_PORT, self.HEARTBEAT_ADDRESS, function(err) {
+			if (err) console.log(err);
+		});
+	}, self.HEARTBEAT_INTERVAL);
+};
+
+Server.prototype.isServer = function() {
+	return this.local === this.server;
 };
 
 Server.prototype.chooseServer = function() {
@@ -122,16 +143,25 @@ Server.prototype.chooseServer = function() {
 	this.print();
 };
 
-Server.prototype.startHeartbeat = function() {
+Server.prototype.listenForSignal = function() {
 	var self = this;
 
-	// emit heartbeats
+	self.signal_socket.on('message', function(message, remote) {
+		console.log("signal from: " + remote.address + ":" + remote.port);
+	});
+};
+
+Server.prototype.startSignal = function() {
+	var self = this;
+
 	setInterval(function() {
-		var buf = new Buffer("heartbeat");
-		self.heartbeat_socket.send(buf, 0, buf.length, self.HEARTBEAT_PORT, self.HEARTBEAT_ADDRESS, function(err) {
+		var buf = new Buffer("signal");
+		self.signal_socket.send(buf, 0, buf.length, self.SIGNAL_PORT, self.server, function(err) {
 			if (err) console.log(err);
 		});
-	}, self.HEARTBEAT_INTERVAL);
+	}, self.SIGNAL_INTERVAL);
+
+
 };
 
 module.exports = Server;
