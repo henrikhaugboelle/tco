@@ -32,6 +32,8 @@ var Server = function Server(dgram) {
 
 	this.server = null;
 	this.local = null;
+	
+	self.received = [];
 
 	this.heartbeat_socket = null;
 	this.signal_raw_socket = null;
@@ -156,22 +158,25 @@ Server.prototype.chooseServer = function() {
 
 	this.server = addr;
 
+	if (!this.isServer()) {
+		this.received.length = 0;
+	}
+
 	this.print();
 };
 
 Server.prototype.listenForRawSignal = function() {
 	var self = this;
 
-	var received = [];
 	self.signal_raw_socket.on('message', function(message, remote) {
 		console.log("raw signal: " + remote.address + ":" + remote.port + " = " + message);
 
-		received.push(message);
+		self.received.push(message);
 
 		if (received.length === self.SIGNAL_PROCESSED_THRESHOLD) {
 			var sum = 0;
-			while (received.length > 0) {
-				sum += parseInt(received.pop(), 10);
+			while (self.received.length > 0) {
+				sum += parseInt(self.received.pop(), 10);
 			}
 
 			var buf = new Buffer(sum + "");
