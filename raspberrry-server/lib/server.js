@@ -160,10 +160,6 @@ Server.prototype.chooseServer = function() {
 
 	this.server = addr;
 
-	if (!this.isServer()) {
-		this.received.length = 0;
-	}
-
 	this.print();
 };
 
