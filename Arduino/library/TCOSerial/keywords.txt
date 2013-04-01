@@ -1,0 +1,17 @@
+#######################################
+# Syntax Coloring Map For TCOSerial
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+TCOSerial	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+readSerial	KEYWORD2
+writeSerial	KEYWORD2
+begin	KEYWORD2
