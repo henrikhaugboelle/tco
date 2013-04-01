@@ -24,6 +24,9 @@ var NetworkNode = function NetworkNode(options) {
 	this.CLIENT_ADDRESS = options.client_address || '255.255.255.255';
 	this.CLIENT_PORT = options.client_port || 42000;
 
+	this.interval_check = null;
+	this.interval_emit = null;
+
 	this.callbacks = {};
 
 	this.nodes = {};
@@ -58,21 +61,25 @@ var NetworkNode = function NetworkNode(options) {
 		self.client_socket.setBroadcast(true);
 	});
 
-	// get own ip
-	var interfaces = os.networkInterfaces();
-	var addrs = [];
+	if (!options.ip) {
+		// get own ip
+		var interfaces = os.networkInterfaces();
+		var addrs = [];
 
-	for (var x in interfaces) {
-		for (var i in interfaces[x]) {
-			var address = interfaces[x][i];
+		for (var x in interfaces) {
+			for (var i in interfaces[x]) {
+				var address = interfaces[x][i];
 
-			if (address.family == 'IPv4' && !address.internal) {
-				addrs.push(address.address)
+				if (address.family == 'IPv4' && !address.internal) {
+					addrs.push(address.address)
+				}
 			}
 		}
-	}
 
-	this.local = this.ip = addrs[0];
+		this.local = this.ip = addrs[0];
+	} else {
+		this.local = this.ip = options.ip;
+	}
 };
 
 NetworkNode.prototype.print = function() {
@@ -95,6 +102,15 @@ NetworkNode.prototype.listen = function() {
 	this.startHeartbeat();
 };
 
+NetworkNode.prototype.close = function() {
+	clearInterval(this.interval_check);
+	clearInterval(this.interval_emit);
+
+	this.heartbeat_socket.close();
+	this.server_socket.close();
+	this.client_socket.close();
+};
+
 NetworkNode.prototype.listenOnHeartbeat = function() {
 	var self = this;
 
@@ -114,7 +130,9 @@ NetworkNode.prototype.listenOnHeartbeat = function() {
 	});
 
 	// check if servers still exists
-	setInterval(function() {
+	self.interval_check = setInterval(function() {
+		// console.log("check if servers still exist");
+		// console.log(self.nodes);
 		for (var address in self.nodes) {
 			if (self.nodes[address] < self.tick) {
 				delete self.nodes[address];
@@ -157,7 +175,7 @@ NetworkNode.prototype.startHeartbeat = function() {
 	var self = this;
 
 	// emit heartbeats
-	setInterval(function() {
+	self.interval_emit = setInterval(function() {
 		var buf = new Buffer("heartbeat");
 		self.heartbeat_socket.send(buf, 0, buf.length, self.HEARTBEAT_PORT, self.HEARTBEAT_ADDRESS, function(err) {
 			if (err) console.log(err);
