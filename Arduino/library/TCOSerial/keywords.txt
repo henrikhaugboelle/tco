@@ -15,3 +15,4 @@ TCOSerial	KEYWORD1
 readSerial	KEYWORD2
 writeSerial	KEYWORD2
 begin	KEYWORD2
+resetRead	KEYWORD2

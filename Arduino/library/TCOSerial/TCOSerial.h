@@ -2,21 +2,26 @@
  *  TCOSerial.h
  */
 
-// header defining the interface of the source.
 #ifndef _TCOSerial_H
 #define _TCOSerial_H
 
+#define _readSize  8
+#define _writeSize  8
+
 #include <Arduino.h>
-#include <QueueList.h>
 
 class TCOSerial {
   public:
     TCOSerial();
     void begin();
-	QueueList <int> *readSerial();
-    void writeSerial(QueueList <int> &outQueue);
+	boolean readSerial();
+    void writeSerial(int writeQueue[], int size);
+	void resetRead();
+	int readSize;
+	int writeSize;
+	int readQueue[_readSize];
+	int readIndex;
   private:
-    QueueList <int> inQueue;
     boolean nextEscaped;
     int ESCAPE;
     int BOUNDARY;
@@ -29,7 +34,10 @@ TCOSerial::TCOSerial() {
 
 void TCOSerial::begin() {
     Serial.begin(9600);
-    nextEscaped = false;
+	readSize = _readSize;
+    writeSize = _writeSize;
+    readIndex = 0;
+	nextEscaped = false;
     ESCAPE = 125;
     BOUNDARY = 126;
     ESCAPEINV = 93;
@@ -38,16 +46,16 @@ void TCOSerial::begin() {
 
 // Returns true if the queue contains a complete message
 // Remember to empty the queue!!!
-QueueList <int> *TCOSerial::readSerial(){
+boolean TCOSerial::readSerial(){
   while(Serial.available() > 0)
   {
     int input = Serial.read();
     if (nextEscaped){
       if(input == ESCAPEINV){
-        inQueue.push(ESCAPE);
+        readQueue[readIndex++] = ESCAPE;
       }
       else if(input == BOUNDARYINV){
-       inQueue.push(BOUNDARY);
+        readQueue[readIndex++] = BOUNDARY;
       }
       // could be that input is not 93 or 94, which is an error
       nextEscaped = false;
@@ -56,18 +64,19 @@ QueueList <int> *TCOSerial::readSerial(){
       nextEscaped = true;
     }
     else if(input == BOUNDARY){
-      return &inQueue;
+	  return true;
     }
     else{
-      inQueue.push(input);
+      readQueue[readIndex++] = input;
     }
   }
-  return NULL;
+  return false;
 }
 
-void TCOSerial::writeSerial(QueueList <int> &outQueue){
-  while (!outQueue.isEmpty ()){
-    int character = outQueue.pop();
+void TCOSerial::writeSerial(int writeQueue[], int size){
+  int i = 0;
+  while (i < size){
+    int character = writeQueue[i++];
     if(character == ESCAPE){
       Serial.write(ESCAPE);
       Serial.write(ESCAPEINV);
@@ -82,4 +91,8 @@ void TCOSerial::writeSerial(QueueList <int> &outQueue){
   }
   Serial.write(BOUNDARY);
 }
-#endif // _QUEUELIST_H
+
+void TCOSerial::resetRead(){
+  readIndex = 0;
+}
+#endif
