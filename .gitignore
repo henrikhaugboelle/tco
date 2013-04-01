@@ -1,4 +1,4 @@
 .DS_Store
 node_modules/*
-raspberrry-server/node_modules/*
+raspberry-server/node_modules/*
 *.save
