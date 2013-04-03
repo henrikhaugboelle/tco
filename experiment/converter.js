@@ -8,17 +8,15 @@ Converter.prototype.constructor = function(options) {
 	this.callbacks = [];
 	this.value_sets = [];
 
-	// this.state = [];
-
-	this.WATCH_INTERVAL = 50;
+	// this.WATCH_INTERVAL = 50;
 };
 
 Converter.prototype.start = function() {
 	var self = this;
 
-	setInterval(function() {
-		self.calculate();
-	}, this.WATCH_INTERVAL);
+	// setInterval(function() {
+	// 	self.calculate();
+	// }, this.WATCH_INTERVAL);
 };
 
 Converter.prototype.calculate = function() {
@@ -31,8 +29,14 @@ Converter.prototype.calculate = function() {
 
 Converter.prototype.push = function(value_set) {
 	this.value_sets.push(value_set);
+
+	if (this.value_sets.length > 10) {
+		this.calculate();
+	}
 };
 
 Converter.prototype.emit = function(callback) {
 	this.callbacks.push(callback);
 };
+
+if (typeof module != 'undefined' && module.exports) module.exports = Converter;

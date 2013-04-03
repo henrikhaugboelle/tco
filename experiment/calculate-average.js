@@ -26,3 +26,5 @@ CalculatorAverage.prototype.calculate = function(converter) {
 
 	return temp;
 };
+
+if (typeof module != 'undefined' && module.exports) module.exports = CalculatorAverage;
