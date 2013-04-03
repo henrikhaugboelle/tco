@@ -16,7 +16,7 @@ CalculatorAverage.prototype.calculate = function(converter) {
 		var value_set = converter.value_sets.pop();
 
 		for (var i in value_set) {
-			temp[i] += value_set[i];
+			temp[i] = parseInt(temp[i] || 0) + parseInt(value_set[i]);
 		}
 	}
 
@@ -24,7 +24,7 @@ CalculatorAverage.prototype.calculate = function(converter) {
 		temp[i] = Math.round(temp[i] / number_of_sets);
 	}
 
-	return temp;
+	return temp || [];
 };
 
 if (typeof module != 'undefined' && module.exports) module.exports = CalculatorAverage;

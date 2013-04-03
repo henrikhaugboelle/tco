@@ -22,10 +22,11 @@ nn.on('clientMessage', function(message, remote) {
 	// console.log("message from client: " + remote.address + ":" + remote.port + " = " + message);
 	
 	console.log("receiving values: " + message);
-	converter.push(message.split(','));
+	converter.push(message.toString().split(','));
 });
 
 converter.emit(function(values) {
+	console.log(values);
 	console.log("sending calculated values: " + values.join(','));
 	nn.sendMessageToClients(values.join(','));
 });
