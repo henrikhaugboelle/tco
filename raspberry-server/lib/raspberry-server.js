@@ -30,7 +30,6 @@ converter.emit(function(values) {
 	nn.sendMessageToClients(values.join(','));
 });
 
-
 // serial to server and server to serial
 serial.on('message', function(values) {
 	nn.sendMessageToServer(values.join(","));
