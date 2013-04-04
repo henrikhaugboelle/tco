@@ -1,0 +1,13 @@
+body {
+	padding: 0px 0px;
+}
+
+#average-color, #average-vibration {
+	height: 142px;
+	border: 1px solid #ddd;
+	margin: 0px 0px 20px 0px;
+}
+
+#average-numbers {
+	font-family: Monaco, Lucida Console, monospace;
+}
