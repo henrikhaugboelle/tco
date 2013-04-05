@@ -81,10 +81,9 @@ Serial.prototype.listen = function() {
 	});
 };
 
+
 Serial.prototype.write = function(values) {
 	var self = this;
-
-	console.log(values);
 
 	if (this.ready) {
 		while (values.length > 0) {
@@ -92,30 +91,30 @@ Serial.prototype.write = function(values) {
 
 			if (character == ESCAPE) {
 				console.log("escape");
-				this.serial.write(String.fromCharCode(ESCAPE), function(err, results) {
+				this.serial.write(new Buffer(String.fromCharCode(ESCAPE), 'ascii'), function(err, results) {
 					if (err) console.log(err);
 				});
-				this.serial.write(String.fromCharCode(ESCAPEINV), function(err, results) {
+				this.serial.write(new Buffer(String.fromCharCode(ESCAPEINV), 'ascii'), function(err, results) {
 					if (err) console.log(err);
 				});
 			} else if (character == BOUNDARY) {
 				console.log("boundary");
-				this.serial.write(String.fromCharCode(ESCAPE), function(err, results) {
+				this.serial.write(new Buffer(String.fromCharCode(ESCAPE), 'ascii'), function(err, results) {
 					if (err) console.log(err);
 				});
-				this.serial.write(String.fromCharCode(BOUNDARYINV), function(err, results) {
+				this.serial.write(new Buffer(String.fromCharCode(BOUNDARYINV), 'ascii'), function(err, results) {
 					if (err) console.log(err);
 				});
 			} else {
-				console.log(String.fromCharCode(character));
-				this.serial.write(String.fromCharCode(character), function(err, results) {
+				// console.log(String.fromCharCode(character));
+				this.serial.write(new Buffer(String.fromCharCode(character), 'ascii'), function(err, results) {
 					if (err) console.log(err);
 				});
 			}
 		}
 
-		console.log(String.fromCharCode(BOUNDARY)); 
-		this.serial.write(String.fromCharCode(BOUNDARY), function(err, results) {
+		// console.log(String.fromCharCode(BOUNDARY));
+		this.serial.write(new Buffer(String.fromCharCode(BOUNDARY), 'ascii'), function(err, results) {
 			if (err) console.log(err);
 		});
 	}
