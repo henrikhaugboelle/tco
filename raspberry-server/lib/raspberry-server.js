@@ -28,9 +28,9 @@ serial.on('message', function(values) {
 });
 
 nn.on('clientMessage', function(message, remote) {
-	console.log("message from client: " + remote.address + ":" + remote.port + " = " + message);
+//	console.log("message from client: " + remote.address + ":" + remote.port + " = " + message);
 	
-nn.sendMessageToClients(message);
+	nn.sendMessageToClients(message);
 	//received.push(message);
 
 	//if (received.length === threshold) {
@@ -44,7 +44,7 @@ nn.sendMessageToClients(message);
 });
 
 nn.on('serverMessage', function(message, remote) {
-	console.log(">> message from server: " + remote.address + ":" + remote.port + " = " + message);
+//	console.log(">> message from server: " + remote.address + ":" + remote.port + " = " + message);
 	serial.write((message+"").split(','));
 });
 
@@ -69,7 +69,7 @@ nn.on('removed', function(ip) {
 //	nn.sendMessageToServer(number);
 //}, 1000);
 
-setInterval(function() {
-	console.log("...");
-	nn.sendMessageToClients("50");
-}, 1000);
+//setInterval(function() {
+//	console.log("...");
+//	nn.sendMessageToClients("50");
+//}, 1000);
