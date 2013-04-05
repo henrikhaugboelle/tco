@@ -1,5 +1,5 @@
 if (typeof module != 'undefined') {
-	var _ = require('underscore'),
+	var _ = require('./../raspberry-server/node_modules/underscore'),
 		Ranger = require('./ranger'),
 		Converter = require('./converter');
 
