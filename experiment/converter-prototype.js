@@ -11,7 +11,7 @@ if (typeof module != 'undefined') {
 var ranger = new Ranger({ min: 0, max: 255 });
 
 var PrototypeConverter = _.inherit(Converter, {
-	time: 200,
+	time: 1000,
 	items: 0,
 
 	state: {
@@ -63,8 +63,11 @@ var PrototypeConverter = _.inherit(Converter, {
 		this.state.magnitude.shift();
 		this.state.magnitude.push(magnitude);
 
-		result = [255, 0, 0, parseInt(magnitude), parseInt(vibration)];
-
+		//result = [255, 0, 0, parseInt(magnitude), parseInt(vibration)];
+	
+		//result = [parseInt(magnitude), parseInt(vibration)];
+		result = [255, 255];
+		
 		this.invoke(result || []);
 	}
 

@@ -27,15 +27,19 @@ converter.start();
 nn.on('clientMessage', function(message, remote) {
 	// console.log("message from client: " + remote.address + ":" + remote.port + " = " + message);
 	
-	console.log("receiving values: " + message);
+	//console.log("receiving values: " + message);
+	var displayValues = message.toString().split(',');
+	for (var d in displayValues) displayValues[d] = pad(displayValues[d]);
+	console.log("     <<< " + displayValues.join(', '));
+
 	converter.push(message.toString().split(','));
 });
 
 converter.emit(function(values) {
 	// just for output
-	var displayValues = values;
+	var displayValues = values.join(',').split(',');
 	for (var d in displayValues) displayValues[d] = pad(displayValues[d]);
-	console.log("sending calculated values: " + values.join(', '));
+	console.log(" >>>     " + displayValues.join(', '));
 	// just for output end
 
 	nn.sendMessageToClients(values.join(','));

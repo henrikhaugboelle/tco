@@ -84,6 +84,8 @@ Serial.prototype.listen = function() {
 Serial.prototype.write = function(values) {
 	var self = this;
 
+	console.log(values);
+
 	if (this.ready) {
 		while (values.length > 0) {
 			var character = values.shift();
@@ -105,12 +107,14 @@ Serial.prototype.write = function(values) {
 					if (err) console.log(err);
 				});
 			} else {
+				console.log(String.fromCharCode(character));
 				this.serial.write(String.fromCharCode(character), function(err, results) {
 					if (err) console.log(err);
 				});
 			}
 		}
 
+		console.log(String.fromCharCode(BOUNDARY));
 		this.serial.write(String.fromCharCode(BOUNDARY), function(err, results) {
 			if (err) console.log(err);
 		});
