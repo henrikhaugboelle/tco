@@ -3,11 +3,9 @@
 
   // Browser and Node.js friendly
   var node = typeof window === 'undefined';
-  var _ = node ? require('underscore') : window._;
+  var _ = node ? require('./../raspberry-server/node_modules/underscore') : window._;
 
-  // Define the mixin
-  _.mixin({
-    inherit: function (Parent, protoProps, staticProps) {
+  var inherit = function (Parent, protoProps, staticProps) {
 
       // `Child` is the passed in `constructor` proto property
       // or a default function that uses w`Parent`'s constructor
@@ -31,5 +29,12 @@
       // Return the finished constructor
       return Child;
     }
+
+  // Define the mixin
+  _.mixin({
+    inherit: inherit
   });
+
+
+  if (typeof module != 'undefined' && module.exports) module.exports = inherit;
 })();

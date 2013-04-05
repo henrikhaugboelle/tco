@@ -1,11 +1,18 @@
-console.log("raspberry-server");
+ console.log("raspberry-server");
+
+function pad(num) {
+    var s = num+"";
+    while (s.length < 3) s = "0" + s;
+    return s;
+}
 
 var NetworkNode = require('./networknode'),
 	Serial = require('./serial');
 
 
-var Converter = require('./../../experiment/converter'),
-	CalculateAverage = require('./../../experiment/calculate-average');
+var AverageConverter = require('./../../experiment/converter-average'),
+	FirstConverter = require('./../../experiment/converter-first'),
+	PrototypeConverter = require('./../../experiment/converter-prototype');
 
 var serial = new Serial();
 serial.listen();
@@ -13,21 +20,27 @@ serial.listen();
 var nn = new NetworkNode();
 nn.listen();
 
-var converter = new Converter({
-	calculator: new CalculateAverage()
-});
+var converter = new PrototypeConverter();
 
 // from client to server and server calculations to clients
 nn.on('clientMessage', function(message, remote) {
 	// console.log("message from client: " + remote.address + ":" + remote.port + " = " + message);
 	
-	console.log("receiving values: " + message);
+	//console.log("receiving values: " + message);
+	var displayValues = message.toString().split(',');
+	for (var d in displayValues) displayValues[d] = pad(displayValues[d]);
+	// console.log("     <<<                                 " + displayValues.join(', '));
+
 	converter.push(message.toString().split(','));
 });
 
 converter.emit(function(values) {
-	console.log(values);
-	console.log("sending calculated values: " + values.join(','));
+	// just for output
+	var displayValues = values.join(',').split(',');
+	for (var d in displayValues) displayValues[d] = pad(displayValues[d]);
+	// console.log(" >>>     " + displayValues.join(', '));
+	// just for output end
+
 	nn.sendMessageToClients(values.join(','));
 });
 
@@ -38,15 +51,18 @@ serial.on('message', function(values) {
 
 nn.on('serverMessage', function(message, remote) {
 	// console.log(">> message from server: " + remote.address + ":" + remote.port + " = " + message);
+	console.log(message + " write");
 	serial.write((message+"").split(','));
 });
 
 // discovery
 nn.on('promoted', function() {
+	converter.start();
 	console.log("I am server now (" + nn.ip + ")");
 });
 
 nn.on('demoted', function() {
+	converter.stop();
 	console.log("I am not server anymore (" + nn.ip + ")");
 });
 

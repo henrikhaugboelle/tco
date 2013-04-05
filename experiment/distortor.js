@@ -17,3 +17,5 @@ Distortor.prototype.setSpectrum = function(spectrum) {
 Distortor.prototype.distort = function(value) {
 	return value + Math.floor((Math.random() * this.spectrum) + 1) - this.half;
 };
+
+if (typeof module != 'undefined' && module.exports) module.exports = Distortor;

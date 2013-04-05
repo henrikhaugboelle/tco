@@ -62,6 +62,7 @@ Sensor.prototype.transition = function(index) {
 		}
 
 		this.interval = setInterval(function() {
+			// console.log("sensor loop");
 			for (var i = 0; i < end.values.length; i++) {
 				vals[i] = Math.round(vals[i] + incs[i]);
 
