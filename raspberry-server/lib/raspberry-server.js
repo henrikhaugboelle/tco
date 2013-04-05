@@ -30,7 +30,7 @@ nn.on('clientMessage', function(message, remote) {
 	//console.log("receiving values: " + message);
 	var displayValues = message.toString().split(',');
 	for (var d in displayValues) displayValues[d] = pad(displayValues[d]);
-	//console.log("     <<<                                 " + displayValues.join(', '));
+	console.log("     <<<                                 " + displayValues.join(', '));
 
 	converter.push(message.toString().split(','));
 });
@@ -39,7 +39,7 @@ converter.emit(function(values) {
 	// just for output
 	var displayValues = values.join(',').split(',');
 	for (var d in displayValues) displayValues[d] = pad(displayValues[d]);
-	//console.log(" >>>     " + displayValues.join(', '));
+	console.log(" >>>     " + displayValues.join(', '));
 	// just for output end
 
 	nn.sendMessageToClients(values.join(','));
