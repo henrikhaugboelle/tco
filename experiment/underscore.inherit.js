@@ -3,7 +3,7 @@
 
   // Browser and Node.js friendly
   var node = typeof window === 'undefined';
-  var _ = node ? require('underscore') : window._;
+  var _ = node ? require('./../raspberry-server/node_modules/underscore') : window._;
 
   var inherit = function (Parent, protoProps, staticProps) {
 
