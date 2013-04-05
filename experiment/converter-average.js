@@ -1,3 +1,13 @@
+if (typeof module != 'undefined') {
+	var _ = require('underscore'),
+		Ranger = require('./ranger'),
+		Converter = require('./converter');
+
+	_.mixin({
+		inherit: require('./underscore.inherit')
+	});
+};
+
 var AverageConverter = _.inherit(Converter, {
 	time: 100,
 	items: 0,

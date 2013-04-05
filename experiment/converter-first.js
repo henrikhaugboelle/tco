@@ -1,5 +1,12 @@
+if (typeof module != 'undefined') {
+	var _ = require('underscore'),
+		Ranger = require('./ranger'),
+		Converter = require('./converter');
 
-var ranger = new Ranger({ min: 0, max: 255 });
+	_.mixin({
+		inherit: require('./underscore.inherit')
+	});
+};
 
 var FirstConverter = _.inherit(Converter, {
 	time: 200,

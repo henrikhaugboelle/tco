@@ -1,11 +1,18 @@
 console.log("raspberry-server");
 
+function pad(num) {
+    var s = num+"";
+    while (s.length < 3) s = "0" + s;
+    return s;
+}
+
 var NetworkNode = require('./networknode'),
 	Serial = require('./serial');
 
 
-var Converter = require('./../../experiment/converter'),
-	CalculateAverage = require('./../../experiment/calculate-average');
+var AverageConverter = require('./../../experiment/converter-average'),
+	FirstConverter = require('./../../experiment/converter-first'),
+	PrototypeConverter = require('./../../experiment/converter-prototype');
 
 var serial = new Serial();
 serial.listen();
@@ -13,9 +20,8 @@ serial.listen();
 var nn = new NetworkNode();
 nn.listen();
 
-var converter = new Converter({
-	calculator: new CalculateAverage()
-});
+var converter = new PrototypeConverter();
+converter.start();
 
 // from client to server and server calculations to clients
 nn.on('clientMessage', function(message, remote) {
@@ -26,8 +32,12 @@ nn.on('clientMessage', function(message, remote) {
 });
 
 converter.emit(function(values) {
-	console.log(values);
-	console.log("sending calculated values: " + values.join(','));
+	// just for output
+	var displayValues = values;
+	for (var d in displayValues) displayValues[d] = pad(displayValues[d]);
+	console.log("sending calculated values: " + values.join(', '));
+	// just for output end
+
 	nn.sendMessageToClients(values.join(','));
 });
 
