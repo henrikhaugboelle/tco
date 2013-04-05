@@ -27,6 +27,7 @@ Arduino.prototype.emit = function(callback) {
 Arduino.prototype.start = function() {
 	var self = this;
 	this.interval = setInterval(function() {
+		// console.log("arduino loop");
 		var values = [];
 
 		for (var key in self.sensors) {
