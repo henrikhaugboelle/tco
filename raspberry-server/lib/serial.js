@@ -114,7 +114,7 @@ Serial.prototype.write = function(values) {
 			}
 		}
 
-		console.log(String.fromCharCode(BOUNDARY));
+		console.log(String.fromCharCode(BOUNDARY)); 
 		this.serial.write(String.fromCharCode(BOUNDARY), function(err, results) {
 			if (err) console.log(err);
 		});
