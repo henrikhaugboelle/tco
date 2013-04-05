@@ -1,9 +1,10 @@
 #include <QueueList.h>
 #include <TCOSerial.h>
 
-QueueList <int> outQueue;
+byte writeQueue[8];
 TCOSerial tcoSerial;
 int timer = 0;
+int counter = 0;
 const int groundPin = 8;
 const int powerPin = 9;
 const int xPin = A1;
@@ -20,29 +21,31 @@ void setup(){
   digitalWrite(powerPin, HIGH);
 }
 
-void echo(){
-  tcoSerial.writeSerial(outQueue);
-}
-
 void loop(){
-  QueueList <int> *inQueuePtr = tcoSerial.readSerial();
-  if(inQueuePtr){
+  if(tcoSerial.readSerial()){
     // set global state
-    QueueList <int> inQueue = *inQueuePtr;
-    while (!(inQueue.isEmpty())){ // TODO: Write logic for signals
-      analogWrite(ledPin, inQueue.pop());
+    byte i = 0;
+    while (i < tcoSerial.readIndex){ // We need logic for how many signals we are receiving and what happens if they are all not there
+      analogWrite(ledPin, tcoSerial.readQueue[i]);
+      i++;
     }
+    tcoSerial.resetRead();
   }
   //if(timer > 10000){ original value
   if(timer > 20000){
-    int x = analogRead(xPin);
-    int y = analogRead(yPin);
-    int z = analogRead(zPin);
-    outQueue.push(x);
-    outQueue.push(y);
-    outQueue.push(z);
-    tcoSerial.writeSerial(outQueue);
+    //byte x = analogRead(xPin) / 4;
+    //byte y = analogRead(yPin) / 4;
+    //byte z = analogRead(zPin) / 4;
+    byte i = 0;
+    writeQueue[i++] = x;
+    //writeQueue[i++] = y;
+    //writeQueue[i++] = z;
+    tcoSerial.writeSerial(writeQueue, i);
     timer = 0;
+  }
+  // Read sensor values 100 times before sending
+  if(timer % 200 = 0)
+  {
   }
   timer++;
 }

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Radical Abstraction Testsuite</title>
+
+		<link href="./bootstrap.css" type="text/css" rel="stylesheet" />
+		<link href="./bootstrap-responsive.css" type="text/css" rel="stylesheet" />
+		<link href="./app.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="span4">
+					<h4>Arduino</h4>
+					<form id="arduino">
+						<label class="control-label">Speed</label>
+						<input type="text" data-bind="value: speed" />
+
+						<div>
+							<button class="btn" type="button" data-bind="click: start">Start</button>
+							<button class="btn" type="button" data-bind="click: stop"> Stop</button>
+							<span data-bind="text: running"></span>
+						</div>
+					</form>
+
+					<h4>Converter</h4>
+					<form id="converter">
+						<div>
+							<button class="btn" type="button" data-bind="click: start">Start</button>
+							<button class="btn" type="button" data-bind="click: stop"> Stop</button>
+							<span data-bind="text: running"></span>
+						</div>
+					</form>
+
+					<h4>Sensors</h4>
+					<form id="sensors">
+						<div>
+							<button class="btn" type="button" data-bind="click: start">Start</button>
+							<button class="btn" type="button" data-bind="click: stop"> Stop</button>
+							<span data-bind="text: running"></span>
+						</div>
+					</form>
+				</div>
+
+				<div id="accelerometer" class="span4">
+					<h4>Accelerometer</h4>
+					<form>
+						<div class="row">
+							<div class="span1">
+								<label class="control-label">Speed</label>
+								<input type="text" data-bind="value: speed" class="span1" />
+							</div>
+							<div class="span1">
+								<label class="control-label">Distortion</label>
+								<input type="text" data-bind="value: distortion" class="span1"  />
+							</div>
+						</div>
+
+						<label class="checkbox">
+							<input type="checkbox" data-bind="checked: repeat" /> Repeat
+						</label>
+
+						<select data-bind="options: sequences, value: sequence"></select>
+						
+						<div>
+							<button class="btn" type="button" data-bind="click: start">Start</button>
+							<button class="btn" type="button" data-bind="click: stop"> Stop</button>
+							<span data-bind="text: running"></span>
+						</div>
+					</form>
+				</div>
+
+				<div id="capacitive" class="span4">
+					<h4>Capacitive Sensor</h4>
+					<form>
+						<div class="row">
+							<div class="span1">
+								<label class="control-label">Speed</label>
+								<input type="text" data-bind="value: speed" class="span1" />
+							</div>
+							<div class="span1">
+								<label class="control-label">Distortion</label>
+								<input type="text" data-bind="value: distortion" class="span1"  />
+							</div>
+						</div>
+
+						<label class="checkbox">
+							<input type="checkbox" data-bind="checked: repeat" /> Repeat
+						</label>
+
+						<select data-bind="options: sequences, value: sequence"></select>
+
+						<div>
+							<button class="btn" type="button" data-bind="click: start">Start</button>
+							<button class="btn" type="button" data-bind="click: stop"> Stop</button>
+							<span data-bind="text: running"></span>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="span6">
+					<h4>Color</h4>
+					<div id="color" class="row">
+						<div class="span3">
+							<div class="box img-rounded" data-bind="style: { background: color1 }"></div>
+						</div>
+						<div class="span3">
+							<div class="box img-rounded" data-bind="style: { background: color2 }"></div>
+						</div>
+					</div>
+
+					<h4>Values</h4>
+					<div id="values">
+						<span data-bind="text: numbers"></span>
+					</div>
+
+					<h4>Magnitude Max</h4>
+					<div id="max">
+						<span data-bind="text: max"></span>
+						<button class="btn" type="button" data-bind="click: clear">Clear</button>
+					</div>
+				</div>
+
+				<div class="span6">
+					<div id="graphs">
+						<h4>Vibration</h4>
+						<div class="box img-rounded">
+							<div id="graph-1" class="img-rounded"></div>
+							<div id="graph-2" class="img-rounded"></div>
+						</div>
+					</div>
+
+					<div id="log">
+						<h4>Log <button class="btn" type="button" data-bind="click: clear">Clear</button></h4>
+					
+						<div class="log box img-rounded" data-bind="foreach: logs">
+							<div data-bind="text: $data"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="./jquery.js"></script>
+		<script src="./jquery.sparkline.js"></script>
+		<script src="./underscore.js"></script>
+		<script src="./underscore.inherit.js"></script>
+		<script src="./knockout.js"></script>
+
+		<script src="./ranger.js"></script>
+		<script src="./distortor.js"></script>
+
+		<script src="./arduino.js"></script>
+
+		<script src="./sequences.js"></script>
+
+		<script src="./sensor.js"></script>
+		<script src="./accelerometer.js"></script>
+		<script src="./capacitivesensor.js"></script>
+
+		<script src="./converter.js"></script>
+		<script src="./converter-average.js"></script>
+		<script src="./converter-first.js"></script>
+		<script src="./converter-prototype.js"></script>
+
+		<script src="./controller.js"></script>
+	</body>
+</html>

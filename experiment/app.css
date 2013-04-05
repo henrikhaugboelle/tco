@@ -1,0 +1,26 @@
+body {
+	padding: 0px 0px;
+}
+
+
+#graph-1, #graph-2 {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+.box {
+	position: relative;
+	height: 142px;
+	border: 1px solid #ddd;
+	margin: 0px 0px 20px 0px;
+}
+
+#values, #log {
+	font-family: Monaco, Lucida Console, monospace;
+}
+
+.log {
+	height: 285px;
+	overflow-y: scroll;
+}
