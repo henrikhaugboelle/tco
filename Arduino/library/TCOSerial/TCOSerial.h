@@ -15,18 +15,18 @@ class TCOSerial {
     TCOSerial();
     void begin();
 	boolean readSerial();
-    void writeSerial(int writeQueue[], int size);
+    void writeSerial(byte writeQueue[], byte size);
 	void resetRead();
-	int readSize;
-	int writeSize;
-	int readQueue[_readSize];
-	int readIndex;
+	byte readSize;
+	byte writeSize;
+	byte readQueue[_readSize];
+	byte inCommingMessageSize;
   private:
     boolean nextEscaped;
-    int ESCAPE;
-    int BOUNDARY;
-    int ESCAPEINV;
-    int BOUNDARYINV;
+    byte ESCAPE;
+    byte BOUNDARY;
+    byte ESCAPEINV;
+    byte BOUNDARYINV;
 };
 
 TCOSerial::TCOSerial() {
@@ -36,7 +36,7 @@ void TCOSerial::begin() {
     Serial.begin(9600);
 	readSize = _readSize;
     writeSize = _writeSize;
-    readIndex = 0;
+    inCommingMessageSize = 0;
 	nextEscaped = false;
     ESCAPE = 125;
     BOUNDARY = 126;
@@ -49,13 +49,13 @@ void TCOSerial::begin() {
 boolean TCOSerial::readSerial(){
   while(Serial.available() > 0)
   {
-    int input = Serial.read();
+    byte input = Serial.read();
     if (nextEscaped){
       if(input == ESCAPEINV){
-        readQueue[readIndex++] = ESCAPE;
+        readQueue[inCommingMessageSize++] = ESCAPE;
       }
       else if(input == BOUNDARYINV){
-        readQueue[readIndex++] = BOUNDARY;
+        readQueue[inCommingMessageSize++] = BOUNDARY;
       }
       // could be that input is not 93 or 94, which is an error
       nextEscaped = false;
@@ -67,16 +67,16 @@ boolean TCOSerial::readSerial(){
 	  return true;
     }
     else{
-      readQueue[readIndex++] = input;
+      readQueue[inCommingMessageSize++] = input;
     }
   }
   return false;
 }
 
-void TCOSerial::writeSerial(int writeQueue[], int size){
-  int i = 0;
+void TCOSerial::writeSerial(byte writeQueue[], byte size){
+  byte i = 0;
   while (i < size){
-    int character = writeQueue[i++];
+    byte character = writeQueue[i++];
     if(character == ESCAPE){
       Serial.write(ESCAPE);
       Serial.write(ESCAPEINV);
@@ -93,6 +93,6 @@ void TCOSerial::writeSerial(int writeQueue[], int size){
 }
 
 void TCOSerial::resetRead(){
-  readIndex = 0;
+  inCommingMessageSize = 0;
 }
 #endif
