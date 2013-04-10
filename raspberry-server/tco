@@ -2,29 +2,9 @@
 #/etc/init.d/tco
 #
 
-#touch ~/tco/raspberry-server/testfile
+export PATH=$PATH:/usr/local/bin
+export NODE_PATH=$NODE_PATH:/usr/lcoal/lib/node_modules
 
-touch /var/tco-test
-
-case "$1" in
-  start)
-    echo "Start TCO"
-    touch /var/tco-start
-    #touch /home/hhau/tco/raspberry-server/startfile 
-    #touch ~/tco/raspberry-server/starttest
-    ;;
-  stop)
-    echo "Stop TCO"
-    #~/tco/raspberry-server/stop.sh
-    ;;
-  restart)
-    echo "Restart TCO"
-    #~/tco/raspberry-server/restart.sh
-    ;;
-  *)
-    echo "Usage: etc/init.d/tco {start|stop}"
-    exit 1
-    ;;
-esac
+exec forever start /home/hhau/tco/raspberry-server/app.js
 
 exit 0
