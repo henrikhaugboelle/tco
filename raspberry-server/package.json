@@ -6,6 +6,7 @@
 		"serialport": "x.x.x"
 	},
 	"devDependencies": {
-		"underscore": "x.x.x"
+		"underscore": "x.x.x",
+		"buster": "x.x.x"
 	}
 }
