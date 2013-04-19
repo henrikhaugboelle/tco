@@ -110,13 +110,13 @@ var ColorConverter = _.inherit(Converter, {
 		
 		if (states[0] > this.movement) {
 			this.still_first = true;
-			console.log("movement");	
+			// console.log("movement");	
 			var step = Math.round(states[0] / 255 * 5);
 
 			this.pure_rgb[this.color] = ranger.range(this.pure_rgb[this.color] - step);
 			this.pure_rgb[(this.color+1) % 3] = ranger.range(this.pure_rgb[(this.color+1) % 3] + step);
 
-			if (this.pure_rgb[this.color] == 0) {
+			if (this.pure_rgb[this.color] <= 1) {
 				this.color++;
 				if (this.color == 3) {
 					this.color = 0;
@@ -169,12 +169,12 @@ var ColorConverter = _.inherit(Converter, {
 				this.decay_rgb[1] > (this.pure_rgb[1] / 2) || 
 				this.decay_rgb[2] > (this.pure_rgb[2] / 2)
 			) {
-				console.log("down to still");
+				// console.log("down to still");
 				this.decay_rgb[0] = r_down_smoother.down();
 				this.decay_rgb[1] = g_down_smoother.down();
 				this.decay_rgb[2] = b_down_smoother.down();
 			} else {
-				console.log("still");
+				// console.log("still");
 				for (var i = 0; i < 3; i++)
 					this.decay_rgb[i] = this.decay_rgb[i] * 0.99;
 			}
@@ -186,6 +186,7 @@ var ColorConverter = _.inherit(Converter, {
 				vibration_smoother.down(),
 			];
 		}
+
 		result[0] = ranger_1.range(result[0]);
 		result[1] = ranger_1.range(result[1]);
 		result[2] = ranger_1.range(result[2]);

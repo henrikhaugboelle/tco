@@ -275,9 +275,8 @@ converter.emit(function(values, log) {
 	if (values) {
 		colorViewModel.color1('rgba(' + values[0] + ',' + values[1] + ',' + values[2] + ',' + 1 + ')');
 		graphViewModel.points1.push(values[3]);
-		graphViewModel.points2.push(values[4]);
-		graphViewModel.points3.push(values[5]);
-		// graphViewModel.points2.push(values[5]);
+		// graphViewModel.points2.push(values[4]);
+		// graphViewModel.points3.push(values[5]);
 	
 		// colorViewModel.color2('rgba(' + values[0] + ',' + values[1] + ',' + values[2] + ',' + (values[4] / 255) + ')');
 		// graphViewModel.points2.push(values[4]);
