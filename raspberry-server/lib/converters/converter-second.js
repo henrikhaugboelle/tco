@@ -1,25 +1,31 @@
 if (typeof module != 'undefined') {
-	var _ = require('./../raspberry-server/node_modules/underscore'),
-		Ranger = require('./ranger'),
-		Parser = require('./parser'),
-		Compressor = require('./compressor'),
+	var _ = require('underscore'),
+		Ranger = require('./../utils/ranger'),
+		Parser = require('./../utils/parser'),
+		Smoother = require('./../utils/smoother'),
+		Compressor = require('./../utils/compressor'),
+		
 		Converter = require('./converter');
 
 	_.mixin({
-		inherit: require('./underscore.inherit')
+		inherit: require('./../misc/underscore.inherit')
 	});
 };
-
 var ranger = new Ranger({ min: 0, max: 255 });
 var parser = new Parser();
-var compressor = new Compressor({ 
-	real_min: 0, real_max: 255,
-	comp_min: 155, comp_max: 255
-});
 
-var ThirdConverter = _.inherit(Converter, {
+var SecondConverter = _.inherit(Converter, {
 	time: 200,
 	items: 0,
+
+	// state: {
+	// 	magnitude: [0, 0, 0, 0, 0],
+	// 	acc: {
+	// 		r: [0, 0, 0, 0, 0],
+	// 		g: [0, 0, 0, 0, 0],
+	// 		b: [0, 0, 0, 0, 0]
+	// 	}
+	// },
 
 	states: [
 		[0, 0, 0, 0, 0],
@@ -45,6 +51,8 @@ var ThirdConverter = _.inherit(Converter, {
 		var magnitude = parser.parse(acc_max[0] + acc_max[1] + acc_max[2]);
 		var states = [acc_max[0], acc_max[1], acc_max[2], magnitude];
 
+		console.log(states);
+
 		var prev_states = this.states;
 		var prev_states_averages = [0, 0, 0, 0, 0];
 
@@ -56,22 +64,17 @@ var ThirdConverter = _.inherit(Converter, {
 			}
 			prev_states_averages[s] = prev_states_averages[s] / prev_states[s].length;
 		
-			damp = prev_states_averages[s] > states[s] ? 1.01 : 8;
+			damp = prev_states_averages[s] > states[s] ? 1.2 : 4;
 			states[s] = states[s] + (prev_states_averages[s] - states[s]) / damp;
 		
 			this.states[s].shift();
 			this.states[s].push(states[s]);
 		}
 
-		result = [
-			states[0], 
-			states[1], 
-			states[2],
-			states[3]
-		];
+		result = [states[0], states[1], states[2], states[3], states[3]];
 
-		result = ranger.range(result);
 		result = parser.parse(result);
+		result = ranger.range(result);
 
 		console.log(result);
 					
@@ -80,4 +83,4 @@ var ThirdConverter = _.inherit(Converter, {
 
 });
 
-if (typeof module != 'undefined' && module.exports) module.exports = ThirdConverter;
+if (typeof module != 'undefined' && module.exports) module.exports = SecondConverter;

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Radical Abstraction Testsuite</title>
+		<title>Raspberry Server Abstraction Testsuite</title>
 
-		<link href="./bootstrap.css" type="text/css" rel="stylesheet" />
-		<link href="./bootstrap-responsive.css" type="text/css" rel="stylesheet" />
-		<link href="./app.css" type="text/css" rel="stylesheet" />
+		<link href="./css/bootstrap.css" type="text/css" rel="stylesheet" />
+		<link href="./css/bootstrap-responsive.css" type="text/css" rel="stylesheet" />
+		<link href="./css/app.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
 		<div class="container">
@@ -129,6 +129,7 @@
 						<div class="box img-rounded">
 							<div id="graph-1" class="img-rounded"></div>
 							<div id="graph-2" class="img-rounded"></div>
+							<div id="graph-3" class="img-rounded"></div>
 						</div>
 					</div>
 
@@ -143,33 +144,33 @@
 			</div>
 		</div>
 
-		<script src="./jquery.js"></script>
-		<script src="./jquery.sparkline.js"></script>
-		<script src="./underscore.js"></script>
-		<script src="./underscore.inherit.js"></script>
-		<script src="./knockout.js"></script>
+		<script src="./js/lib/jquery.js"></script>
+		<script src="./js/lib/jquery.sparkline.js"></script>
+		<script src="./js/lib/underscore.js"></script>
+		<script src="./js/lib/underscore.inherit.js"></script>
+		<script src="./js/lib/knockout.js"></script>
 
-		<script src="./parser.js"></script>
-		<script src="./ranger.js"></script>
-		<script src="./distortor.js"></script>
-		<script src="./compressor.js"></script>
+		<script src="./js/hardware/arduino.js"></script>
+		<script src="./js/hardware/sensor.js"></script>
+		<script src="./js/hardware/accelerometer.js"></script>
+		<script src="./js/hardware/capacitivesensor.js"></script>
 
-		<script src="./arduino.js"></script>
+		<script src="./../raspberry-server/lib/utils/parser.js"></script>
+		<script src="./../raspberry-server/lib/utils/ranger.js"></script>
+		<script src="./../raspberry-server/lib/utils/distortor.js"></script>
+		<script src="./../raspberry-server/lib/utils/compressor.js"></script>
+		<script src="./../raspberry-server/lib/utils/smoother.js"></script>
 
-		<script src="./sequences.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter-average.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter-first.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter-prototype.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter-second.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter-third.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter-color.js"></script>
+		<script src="./../raspberry-server/lib/converters/converter-walk.js"></script>
 
-		<script src="./sensor.js"></script>
-		<script src="./accelerometer.js"></script>
-		<script src="./capacitivesensor.js"></script>
-
-		<script src="./converter.js"></script>
-		<script src="./converter-average.js"></script>
-		<script src="./converter-first.js"></script>
-		<script src="./converter-prototype.js"></script>
-		<script src="./converter-second.js"></script>
-		<script src="./converter-third.js"></script>
-		<script src="./converter-color.js"></script>
-
-		<script src="./controller.js"></script>
+		<script src="./js/sequences.js"></script>
+		<script src="./js/main.js"></script>
 	</body>
 </html>

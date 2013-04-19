@@ -1,27 +1,34 @@
 if (typeof module != 'undefined') {
-	var _ = require('./../raspberry-server/node_modules/underscore'),
-		Ranger = require('./ranger'),
-		Parser = require('./parser'),
+	var _ = require('underscore'),
+		Ranger = require('./../utils/ranger'),
+		Parser = require('./../utils/parser'),
+		Smoother = require('./../utils/smoother'),
+		Compressor = require('./../utils/compressor'),
+		
 		Converter = require('./converter');
 
 	_.mixin({
-		inherit: require('./underscore.inherit')
+		inherit: require('./../misc/underscore.inherit')
 	});
 };
 
 var ranger = new Ranger({ min: 0, max: 255 });
 var parser = new Parser();
+var compressor = new Compressor({ 
+	real_min: 0, real_max: 255,
+	comp_min: 155, comp_max: 255
+});
 
-var ColorConverter = _.inherit(Converter, {
+var ThirdConverter = _.inherit(Converter, {
 	time: 200,
 	items: 0,
 
 	states: [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0]
 	],
-
-	rgb: [255, 0, 0],
-	color: 0,
 
 	calculate: function() {
 		var result = [];
@@ -38,8 +45,7 @@ var ColorConverter = _.inherit(Converter, {
 		}
 
 		var magnitude = parser.parse(acc_max[0] + acc_max[1] + acc_max[2]);
-
-		var states = [magnitude];
+		var states = [acc_max[0], acc_max[1], acc_max[2], magnitude];
 
 		var prev_states = this.states;
 		var prev_states_averages = [0, 0, 0, 0, 0];
@@ -51,36 +57,29 @@ var ColorConverter = _.inherit(Converter, {
 				prev_states_averages[s] += parseInt(prev_states[s][v]);
 			}
 			prev_states_averages[s] = prev_states_averages[s] / prev_states[s].length;
-			
-			damp = prev_states_averages[s] > states[s] ? 1.8 : 4;
+		
+			damp = prev_states_averages[s] > states[s] ? 1.01 : 8;
 			states[s] = states[s] + (prev_states_averages[s] - states[s]) / damp;
 		
 			this.states[s].shift();
 			this.states[s].push(states[s]);
 		}
-		
-		if (states[0] > 30) {
-			var step = Math.round(states[0] / 255 * 10);
 
-			this.rgb[this.color] = ranger.range(this.rgb[this.color] - step);
-			this.rgb[(this.color+1) % 3] = ranger.range(this.rgb[(this.color+1) % 3] + step);
-
-			if (this.rgb[this.color] == 0) {
-				this.color++;
-				if (this.color == 3) {
-					this.color = 0;
-				}
-			}
-		}
-
-		result = [this.rgb[0], this.rgb[1], this.rgb[2], 255, states[0], magnitude];
+		result = [
+			states[0], 
+			states[1], 
+			states[2],
+			states[3]
+		];
 
 		result = ranger.range(result);
 		result = parser.parse(result);
 
+		console.log(result);
+					
 		this.invoke(result || []);
 	}
 
 });
 
-if (typeof module != 'undefined' && module.exports) module.exports = ColorConverter;
+if (typeof module != 'undefined' && module.exports) module.exports = ThirdConverter;

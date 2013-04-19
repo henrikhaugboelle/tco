@@ -1,5 +1,5 @@
 if (typeof module != 'undefined') {
-	var _ = require('./../raspberry-server/node_modules/underscore');
+	var _ = require('underscore');
 };
 
 var Ranger = function() {
