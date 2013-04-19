@@ -21,6 +21,10 @@ var r_down_smoother = new Smoother({ step_down: 20 });
 var g_down_smoother = new Smoother({ step_down: 20 });
 var b_down_smoother = new Smoother({ step_down: 20 });
 
+var r_up_smoother = new Smoother({ step_up: 8 });
+var g_up_smoother = new Smoother({ step_up: 8 });
+var b_up_smoother = new Smoother({ step_up: 8 });
+
 var ColorConverter = _.inherit(Converter, {
 	time: 100,
 	items: 0,
@@ -34,49 +38,18 @@ var ColorConverter = _.inherit(Converter, {
 
 	color: 0,
 
-	touch: 1,
-	movement: 30,
+	touch: 100,
+	movement: 60,
 
 	still_first: true,
 
 	calculate: function() {
-		// NOTES
-		// when magnitude (sum of movement) is over {threshold}, then there is movement -> the light is fully on and not decaying
-		// when magnitude is under {threshold}, then light returns to half strength and slowly decays
-		// when there is movement again, this state is "reset" (return to "step 1")
-
-		// magnitude controls how fast the color changes - the more magnitude, the more change
-
-		// capasivity sensor; when held in hand, light should be at full strength
-
-		// movement:
-		//   light: full
-		//   changing: true
-		//   vibration: true
-		//   decaying: false
-
-		// touch:
-		//   light: full
-		//   changing: false
-		//   vibration: false
-		//   decaying: false
-
-		// none:
-		//   light: half
-		//   changing: false
-		//   vibration: false
-		//   decaying: true
-
-		// potential improvements:
-		//  o smooth transitions between half / full
-		//  o pulsating
-		//  o coordinated pulsating 
-		//  o vibration according to movement [NOT A PRIORITY]
-		//  o vibration/movement smoothing [DONE]
-
 		var result = [];
 
 		var acc_max = [0, 0, 0];
+		var cap_avg = 0;
+		
+		var len = this.value_sets.length;
 
 		while (this.value_sets.length > 0) {
 			var value_set = this.value_sets.pop();
@@ -85,10 +58,12 @@ var ColorConverter = _.inherit(Converter, {
 				value_set[i] = parseInt(value_set[i]);
 				if (value_set[i] > acc_max[i]) acc_max[i] = value_set[i];
 			}
+
+			cap_avg = cap_avg + parseInt(value_set[3]);
 		}
 
 		var magnitude = parser.parse(acc_max[0] + acc_max[1] + acc_max[2]);
-		var capacivity = 0;
+		var capacivity = parser.parse(cap_avg / len);
 
 		var states = [magnitude];
 
@@ -109,14 +84,14 @@ var ColorConverter = _.inherit(Converter, {
 		}
 		
 		if (states[0] > this.movement) {
-			this.still_first = true;
-			// console.log("movement");	
+			//console.log("movement");
+			this.still_first = true;	
 			var step = Math.round(states[0] / 255 * 5);
 
 			this.pure_rgb[this.color] = ranger.range(this.pure_rgb[this.color] - step);
 			this.pure_rgb[(this.color+1) % 3] = ranger.range(this.pure_rgb[(this.color+1) % 3] + step);
 
-			if (this.pure_rgb[this.color] <= 1) {
+			if (this.pure_rgb[this.color] == 0) {
 				this.color++;
 				if (this.color == 3) {
 					this.color = 0;
@@ -124,8 +99,6 @@ var ColorConverter = _.inherit(Converter, {
 			}
 
 			this.decay_rgb = this.pure_rgb.slice();
-			//for (var i = 0; i < 3; i++)
-			//	this.decay_rgb[i] = this.pure_rgb[i] / 2;
 
 			result = [
 				this.pure_rgb[0],
@@ -135,16 +108,29 @@ var ColorConverter = _.inherit(Converter, {
 			];
 
 		} else if (capacivity > this.touch) {
+			//console.log("touch");
 			this.still_first = true;
 
-			this.decay_rgb = this.pure_rgb.slice();
-			//for (var i = 0; i < 3; i++)
-			//	this.decay_rgb[i] = this.pure_rgb[i] / 2;
+			r_up_smoother.min = this.decay_rgb[0];
+			r_up_smoother.max = this.pure_rgb[0];
+			r_up_smoother.value = this.decay_rgb[0];
+
+			g_up_smoother.min = this.decay_rgb[1];
+			g_up_smoother.max = this.pure_rgb[1];
+			g_up_smoother.value = this.decay_rgb[1];
+
+			b_up_smoother.min = this.decay_rgb[2];
+			b_up_smoother.max = this.pure_rgb[2];
+			b_up_smoother.value = this.decay_rgb[2];
+
+			this.decay_rgb[0] = r_up_smoother.up();
+			this.decay_rgb[1] = g_up_smoother.up();
+			this.decay_rgb[2] = b_up_smoother.up();
 
 			result = [
-				this.pure_rgb[0],
-				this.pure_rgb[1], 
-				this.pure_rgb[2], 
+				this.decay_rgb[0],
+				this.decay_rgb[1],
+				this.decay_rgb[2],
 				vibration_smoother.down()
 			];
 		} else {
@@ -169,14 +155,14 @@ var ColorConverter = _.inherit(Converter, {
 				this.decay_rgb[1] > (this.pure_rgb[1] / 2) || 
 				this.decay_rgb[2] > (this.pure_rgb[2] / 2)
 			) {
-				// console.log("down to still");
+				//console.log("down to still");
 				this.decay_rgb[0] = r_down_smoother.down();
 				this.decay_rgb[1] = g_down_smoother.down();
 				this.decay_rgb[2] = b_down_smoother.down();
 			} else {
-				// console.log("still");
+				//console.log("still");
 				for (var i = 0; i < 3; i++)
-					this.decay_rgb[i] = this.decay_rgb[i] * 0.99;
+					this.decay_rgb[i] = this.decay_rgb[i] * 0.999986544;
 			}
 
 			result = [
@@ -186,17 +172,14 @@ var ColorConverter = _.inherit(Converter, {
 				vibration_smoother.down(),
 			];
 		}
-
 		result[0] = ranger_1.range(result[0]);
 		result[1] = ranger_1.range(result[1]);
 		result[2] = ranger_1.range(result[2]);
 		result[3] = ranger.range(result[3]);
 
 		result = parser.parse(result);
-
-		console.log(result);
-
-		//console.log(result.join(', ') + ', ' + acc_max.join(', ') + ', ' + magnitude);
+		
+		// console.log(result);
 
 		this.invoke(result || []);
 	}
