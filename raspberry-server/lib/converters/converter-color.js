@@ -17,9 +17,9 @@ var ranger_1 = new Ranger({ min: 1, max: 255 });
 var parser = new Parser();
 var vibration_smoother = new Smoother({ min: 0, max: 155, step_up: 1, step_down: 20, value: 0 });
 
-var r_down_smoother = new Smoother({ step_down: 20 });
-var g_down_smoother = new Smoother({ step_down: 20 });
-var b_down_smoother = new Smoother({ step_down: 20 });
+var r_down_smoother = new Smoother({ step_down: 8 });
+var g_down_smoother = new Smoother({ step_down: 8 });
+var b_down_smoother = new Smoother({ step_down: 8 });
 
 var r_up_smoother = new Smoother({ step_up: 8 });
 var g_up_smoother = new Smoother({ step_up: 8 });
