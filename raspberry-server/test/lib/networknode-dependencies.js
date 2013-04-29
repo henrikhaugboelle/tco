@@ -100,34 +100,11 @@ Network.prototype.remove = function(socket) {
 	}
 };
 
-// Network.prototype.get = function(ip) {
-// 	for (var x in this.sockets) {
-// 		console.log(this.sockets[x].ip);
-// 		if (this.sockets[x].ip === ip) {
-// 			return this.sockets[x];
-// 		}
-// 	}
-
-// 	return null;
-// };
-
 Network.prototype.count = function() {
 	return this.sockets.length;
 };
 
-// Network.prototype.serverCount = function() {
-// 	var ips = {},
-// 		num = 0;
-
-// 	for (var x in this.sockets) {
-// 		if (!ips[this.sockets[x].ip]) {
-// 			ips[this.sockets[x].ip] = true;
-// 			num++;
-// 		}
-// 	}
-
-// 	return num;
-// };
+///
 
 var Dependencies = function() {
 	Dependencies.prototype.constructor.apply(this, arguments);

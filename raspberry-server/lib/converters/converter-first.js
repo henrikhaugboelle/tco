@@ -1,10 +1,14 @@
 if (typeof module != 'undefined') {
-	var _ = require('./../raspberry-server/node_modules/underscore'),
-		Ranger = require('./ranger'),
+	var _ = require('underscore'),
+		Ranger = require('./../utils/ranger'),
+		Parser = require('./../utils/parser'),
+		Smoother = require('./../utils/smoother'),
+		Compressor = require('./../utils/compressor'),
+		
 		Converter = require('./converter');
 
 	_.mixin({
-		inherit: require('./underscore.inherit')
+		inherit: require('./../misc/underscore.inherit')
 	});
 };
 

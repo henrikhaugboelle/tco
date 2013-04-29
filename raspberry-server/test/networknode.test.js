@@ -366,22 +366,3 @@ describe("NetworkNode", function() {
 		}, 250);
 	});
 });
-
-// ## discovery, election
-// if one node -> server
-// if more nodes -> server with highest ip
-// three switch between servers
-
-// # discovery, election, callbacks
-// test callbacks
-// promoted
-// demoted
-// added
-// removed
-
-// # messages
-// send message from client to server
-// send messages from clients to server
-
-// send message from server to client
-// send message from server to clients

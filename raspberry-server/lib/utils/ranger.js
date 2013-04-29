@@ -1,3 +1,6 @@
+if (typeof module != 'undefined') {
+	var _ = require('underscore');
+};
 
 var Ranger = function() {
 	Ranger.prototype.constructor.apply(this, arguments);
@@ -9,13 +12,19 @@ Ranger.prototype.constructor = function(options) {
 };
 
 Ranger.prototype.range = function(value) {
-	if (value < this.min) {
-		return this.min;
-	} else if (value > this.max) {
-		return this.max;
+	if (_.isArray(value)) {
+		for (var i in value) {
+			value[i] = this.range(value[i]);
+		}
 	} else {
-		return value;
+		if (value < this.min) {
+			value = this.min;
+		} else if (value > this.max) {
+			value = this.max;
+		}
 	}
+
+	return value;
 };
 
 if (typeof module != 'undefined' && module.exports) module.exports = Ranger;
