@@ -5,8 +5,7 @@
 #ifndef _TCOSerial_H
 #define _TCOSerial_H
 
-#define _readSize  8
-#define _writeSize  8
+#define _readBufferSize  8
 
 #include <Arduino.h>
 
@@ -16,13 +15,12 @@ class TCOSerial {
     void begin();
 	boolean readSerial();
     void writeSerial(byte writeQueue[], byte size);
-	void resetRead();
-	byte readSize;
-	byte writeSize;
-	byte readQueue[_readSize];
-	byte inCommingMessageSize;
+	byte inCommingMessageSize();
+	byte readQueue[_readBufferSize];
   private:
+    byte messageSize;
     boolean nextEscaped;
+	boolean newMessage;
     byte ESCAPE;
     byte BOUNDARY;
     byte ESCAPEINV;
@@ -34,28 +32,29 @@ TCOSerial::TCOSerial() {
 
 void TCOSerial::begin() {
     Serial.begin(9600);
-	readSize = _readSize;
-    writeSize = _writeSize;
-    inCommingMessageSize = 0;
+    messageSize = 0;
 	nextEscaped = false;
+	newMessage = true;
     ESCAPE = 125;
     BOUNDARY = 126;
     ESCAPEINV = 93;
     BOUNDARYINV = 94;
 }
 
-// Returns true if the queue contains a complete message
-// Remember to empty the queue!!!
 boolean TCOSerial::readSerial(){
+  if(newMessage){
+    messageSize = 0;
+	newMessage = false;
+  }
   while(Serial.available() > 0)
   {
     byte input = Serial.read();
     if (nextEscaped){
       if(input == ESCAPEINV){
-        readQueue[inCommingMessageSize++] = ESCAPE;
+        readQueue[messageSize++] = ESCAPE;
       }
       else if(input == BOUNDARYINV){
-        readQueue[inCommingMessageSize++] = BOUNDARY;
+        readQueue[messageSize++] = BOUNDARY;
       }
       // could be that input is not 93 or 94, which is an error
       nextEscaped = false;
@@ -64,10 +63,11 @@ boolean TCOSerial::readSerial(){
       nextEscaped = true;
     }
     else if(input == BOUNDARY){
+	  newMessage = true;
 	  return true;
     }
     else{
-      readQueue[inCommingMessageSize++] = input;
+      readQueue[messageSize++] = input;
     }
   }
   return false;
@@ -92,7 +92,7 @@ void TCOSerial::writeSerial(byte writeQueue[], byte size){
   Serial.write(BOUNDARY);
 }
 
-void TCOSerial::resetRead(){
-  inCommingMessageSize = 0;
+byte TCOSerial::inCommingMessageSize(){
+  return messageSize;
 }
 #endif
