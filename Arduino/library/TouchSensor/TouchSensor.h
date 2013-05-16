@@ -6,8 +6,8 @@
 */
 
 // ensure this library description is only included once
-#ifndef CapacitiveSensor_h
-#define CapacitiveSensor_h
+#ifndef TouchSensor_h
+#define TouchSensor_h
 
 #if ARDUINO >= 100
 #include "Arduino.h"
@@ -16,13 +16,13 @@
 #endif
 
 // library interface description
-class CapacitiveSensor
+class TouchSensor
 {
   // user-accessible "public" interface
   public:
   // methods
-	CapacitiveSensor(uint8_t sendPin, uint8_t receivePin);
-	long capacitiveSensorRaw(uint8_t samples);
+	TouchSensor(uint8_t sendPin, uint8_t receivePin);
+	long read(int samples);
   // library-accessible "private" interface
   private:
   // variables

@@ -6,9 +6,9 @@ byte lastY = 0;
 byte lastZ = 0;
 
 void setup(){
-  tcoPlatform.setSendValues(&sendValues);
-  tcoPlatform.setSetState(&setState);
-  tcoPlatform.begin(4, 4);
+  tcoPlatform.setSendValues(&sendValues);   // Method for handling output
+  tcoPlatform.setSetState(&setState);       // Method for handling input
+  tcoPlatform.begin(4, 4);                  // Start the platform, input and output buffer size = 4
 }
 
 void loop(){

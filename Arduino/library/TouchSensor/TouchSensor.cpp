@@ -6,9 +6,9 @@
 #include "WConstants.h"
 #endif
 
-#include "CapacitiveSensor.h"
+#include "TouchSensor.h"
 
-CapacitiveSensor::CapacitiveSensor(uint8_t sendPin, uint8_t receivePin)
+TouchSensor::TouchSensor(uint8_t sendPin, uint8_t receivePin)
 {
 	uint8_t sPort, rPort;
 
@@ -31,11 +31,11 @@ CapacitiveSensor::CapacitiveSensor(uint8_t sendPin, uint8_t receivePin)
     interrupts();
 }
 
-long CapacitiveSensor::capacitiveSensorRaw(uint8_t samples)
+long TouchSensor::read(int samples)
 {
 	total = 0;
 
-	for (uint8_t i = 0; i < samples; i++) {
+	for (int i = 0; i < samples; i++) {
 		SenseOneCycle();
 	}
 
@@ -43,7 +43,7 @@ long CapacitiveSensor::capacitiveSensorRaw(uint8_t samples)
 }
 
 
-int CapacitiveSensor::SenseOneCycle(void)
+int TouchSensor::SenseOneCycle(void)
 {
     noInterrupts();
 	*sOut &= ~sBit;        // set Send Pin Register low

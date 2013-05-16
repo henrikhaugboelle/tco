@@ -1,9 +1,8 @@
-#include <CapacitiveSensor.h>
+#include <TouchSensor.h>
 #include <TCOPlatform.h>
 
 const int inputBuffer = 4;
 const int outputBuffer = 4;
-const long leastTouchValue = 20000;
 const int expectedInCommingMessageSize = 4;
 const long touchFactor = 300;
 const int ledGroundPin2 = 2;
@@ -23,8 +22,9 @@ const int yPin = A2;
 const int zPin = A3;
 
 TCOPlatform tcoPlatform;
-CapacitiveSensor touchSensor = CapacitiveSensor(touchSendPin,touchReceivePin);
+TouchSensor touchSensor = TouchSensor(touchSendPin,touchReceivePin);
 
+long leastTouchValue = 20000;
 byte lastX = 0;
 byte lastY = 0;
 byte lastZ = 0;
@@ -56,7 +56,7 @@ int sendValues(byte *queue, int length){
     byte x = analogRead(xPin) / 4;
     byte y = analogRead(yPin) / 4;
     byte z = analogRead(zPin) / 4;
-    int touchValue = touchSensor.capacitiveSensorRaw(30);
+    int touchValue = touchSensor.read(30);
     if(touchValue < leastTouchValue){
       leastTouchValue = touchValue;
     }
