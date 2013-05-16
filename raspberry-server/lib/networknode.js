@@ -141,7 +141,9 @@ NetworkNode.prototype.listenOnHeartbeat = function() {
 					self.callbacks['removed'][x].call(self, address);
 				}
 
-				self.chooseServer();
+				if (address === self.server) {
+					self.chooseServer();
+				}
 			}
 		}
 
