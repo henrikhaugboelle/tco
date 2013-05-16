@@ -16,7 +16,7 @@ class TCOSerial {
 	boolean readSerial();
     void writeSerial(byte writeQueue[], byte size);
 	byte inCommingMessageSize();
-	byte readQueue[_readBufferSize];
+	byte *readQueue;
   private:
     byte messageSize;
     boolean nextEscaped;
@@ -30,8 +30,9 @@ class TCOSerial {
 TCOSerial::TCOSerial() {
 }
 
-void TCOSerial::begin() {
+void TCOSerial::begin(int bufferSize) {
     Serial.begin(9600);
+	readQueue = malloc(bufferSize * sizeof(byte));
     messageSize = 0;
 	nextEscaped = false;
 	newMessage = true;
