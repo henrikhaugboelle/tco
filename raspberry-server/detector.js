@@ -12,9 +12,9 @@ network.on('demoted', function() {
 });
 
 network.on('added', function(ip) {
-	console.log("A server was added (" + ip + ")");
+	console.log("A unit was added (" + ip + ")");
 });
 
 network.on('removed', function(ip) {
-	console.log("A server was removed (" + ip + ")");
+	console.log("A unit was removed (" + ip + ")");
 });
