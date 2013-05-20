@@ -53,18 +53,21 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 
 		while (this.value_sets.length > 0) {
 			var value_set = this.value_sets.pop();
-			
+			console.log(value_set);
 			for (var i = 0; i < 3; i++) {
 				value_set[i] = parseInt(value_set[i]);
 				if (value_set[i] > acc_max[i]) acc_max[i] = value_set[i];
 			}
 
-			value_set[4] = parseInt(value_set[4]);
-			if (value_set[4] > cap_max[4]) cap_max[4] = value_set[4];
+			value_set[3] = parseInt(value_set[3]);
+			console.log(value_set[3]);
+			if (value_set[3] > cap_max) cap_max = value_set[3];
 		}
 
 		var magnitude = parser.parse(acc_max[0] + acc_max[1] + acc_max[2]);
 		var capacivity = cap_max;
+		//console.log(capacivity);
+		//console.log(cap_max);
 
 		var states = [magnitude];
 
@@ -109,7 +112,7 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 			];
 
 		} else if (capacivity > this.touch) {
-			//console.log("touch");
+			console.log("touch");
 			this.still_first = true;
 
 			r_up_smoother.min = this.decay_rgb[0];
