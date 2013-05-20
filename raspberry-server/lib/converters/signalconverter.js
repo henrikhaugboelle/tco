@@ -180,8 +180,6 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 
 		result = parser.parse(result);
 		
-		// console.log(result);
-
 		this.invoke(result || []);
 	}
 
