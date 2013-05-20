@@ -2,8 +2,12 @@ var Converter = function() {
 	Converter.prototype.constructor.apply(this, arguments);
 };
 
-Converter.prototype.constructor = function() {
+Converter.prototype.constructor = function(options) {
 	var self = this;
+
+	options = options || {};
+	this.time = options.time || this.time || undefined;
+	this.items = options.items || this.items || undefined;
 
 	this.callbacks = [];
 	this.value_sets = [];

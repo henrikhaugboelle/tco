@@ -1,1 +1,1 @@
-module.exports = require('./lib/raspberry-server.js');
+module.exports = require('./lib/dsplatform.js');

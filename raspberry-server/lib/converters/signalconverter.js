@@ -5,7 +5,7 @@ if (typeof module != 'undefined') {
 		Smoother = require('./../utils/smoother'),
 		Compressor = require('./../utils/compressor'),
 		
-		Converter = require('./converter');
+		AbstractSignalConverter = require('./abstractsignalconverter');
 
 	_.mixin({
 		inherit: require('./../misc/underscore.inherit')
@@ -25,7 +25,7 @@ var r_up_smoother = new Smoother({ step_up: 8 });
 var g_up_smoother = new Smoother({ step_up: 8 });
 var b_up_smoother = new Smoother({ step_up: 8 });
 
-var ColorConverter = _.inherit(Converter, {
+var SignalConverter = _.inherit(AbstractSignalConverter, {
 	time: 100,
 	items: 0,
 
@@ -47,7 +47,7 @@ var ColorConverter = _.inherit(Converter, {
 		var result = [];
 
 		var acc_max = [0, 0, 0];
-		var cap_avg = 0;
+		var cap_max = 0;
 		
 		var len = this.value_sets.length;
 
@@ -59,11 +59,12 @@ var ColorConverter = _.inherit(Converter, {
 				if (value_set[i] > acc_max[i]) acc_max[i] = value_set[i];
 			}
 
-			cap_avg = cap_avg + parseInt(value_set[3]);
+			value_set[3] = parseInt(value_set[3]);
+			if (value_set[3] > cap_max) cap_max = value_set[3];
 		}
 
 		var magnitude = parser.parse(acc_max[0] + acc_max[1] + acc_max[2]);
-		var capacivity = parser.parse(cap_avg / len);
+		var capacivity = cap_max;
 
 		var states = [magnitude];
 
@@ -179,11 +180,9 @@ var ColorConverter = _.inherit(Converter, {
 
 		result = parser.parse(result);
 		
-		// console.log(result);
-
 		this.invoke(result || []);
 	}
 
 });
 
-if (typeof module != 'undefined' && module.exports) module.exports = ColorConverter;
+if (typeof module != 'undefined' && module.exports) module.exports = SignalConverter;

@@ -1,41 +1,20 @@
-console.log("raspberry-server");
+var NetworkCommunication = require('./lib/networkcommunication'),
+	network = new NetworkCommunication();
 
-var NetworkNode = require('./lib/networknode'),
-	nn = new NetworkNode();
+network.listen();
 
-nn.listen();
-
-// from client to server and server calculations to clients
-// nn.on('clientMessage', function(message, remote) {
-// 	converter.push(message.toString().split(','));
-// });
-
-// converter.emit(function(values) {
-// 	nn.sendMessageToClients(values.join(','));
-// });
-
-// // serial to server and server to serial
-// serial.on('message', function(values) {
-// 	nn.sendMessageToServer(values.join(","));
-// });
-
-// nn.on('serverMessage', function(message, remote) {
-// 	serial.write((message+"").split(','));
-// });
-
-// discovery
-nn.on('promoted', function() {
-	console.log("I am server now (" + nn.ip + ")");
+network.on('promoted', function() {
+	console.log("I am server now (" + network.ip + ")");
 });
 
-nn.on('demoted', function() {
-	console.log("I am not server anymore (" + nn.ip + ")");
+network.on('demoted', function() {
+	console.log("I am not server anymore (" + network.ip + ")");
 });
 
-nn.on('added', function(ip) {
-	console.log("A server was added (" + ip + ")");
+network.on('added', function(ip) {
+	console.log("A unit was added (" + ip + ")");
 });
 
-nn.on('removed', function(ip) {
-	console.log("A server was removed (" + ip + ")");
+network.on('removed', function(ip) {
+	console.log("A unit was removed (" + ip + ")");
 });
