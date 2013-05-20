@@ -1,10 +1,10 @@
 require('buster').spec.expose();
 
 var _ = require('underscore'),
-	Dependencies = require('./lib/networknode-dependencies').Dependencies,
-	NetworkNode = require('./../lib/networknode');
+	Dependencies = require('./lib/networkcommunication-dependencies').Dependencies,
+	NetworkCommunication = require('./../lib/networkcommunication');
 
-describe("NetworkNode", function() {
+describe("NetworkCommunication", function() {
 	beforeAll(function() {
 		this.timeout = 1000 * 5;
 	});
@@ -22,7 +22,7 @@ describe("NetworkNode", function() {
 		};
 
 		this.node = function(address) {
-			return new NetworkNode({
+			return new NetworkCommunication({
 				dgram: self.dgram(self.ip(address)),
 				ip: self.ip(address)
 			});

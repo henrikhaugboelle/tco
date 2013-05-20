@@ -5,7 +5,7 @@ if (typeof module != 'undefined') {
 		Smoother = require('./../utils/smoother'),
 		Compressor = require('./../utils/compressor'),
 		
-		Converter = require('./converter');
+		AbstractSignalConverter = require('./abstractsignalconverter');
 
 	_.mixin({
 		inherit: require('./../misc/underscore.inherit')
@@ -25,7 +25,7 @@ var r_up_smoother = new Smoother({ step_up: 8 });
 var g_up_smoother = new Smoother({ step_up: 8 });
 var b_up_smoother = new Smoother({ step_up: 8 });
 
-var ColorConverter = _.inherit(Converter, {
+var SignalConverter = _.inherit(AbstractSignalConverter, {
 	time: 100,
 	items: 0,
 
@@ -186,4 +186,4 @@ var ColorConverter = _.inherit(Converter, {
 
 });
 
-if (typeof module != 'undefined' && module.exports) module.exports = ColorConverter;
+if (typeof module != 'undefined' && module.exports) module.exports = SignalConverter;
