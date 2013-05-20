@@ -1,3 +1,13 @@
+/*
+  CapacitiveSense.h v.04 - Capacitive Sensing Library for 'duino / Wiring
+  Copyright (c) 2008 Paul Bagder  All rights reserved.
+  Version 04 by Paul Stoffregen - Arduino 1.0 compatibility, issue 146 fix
+  vim: set ts=4:
+*/
+/*
+  Modified by Christian Olsson, Kåre Sylow and Henrik Haugboelle 2013
+*/
+
 #if ARDUINO >= 100
 #include "Arduino.h"
 #else
@@ -8,11 +18,11 @@
 
 #include "TouchSensor.h"
 
-TouchSensor::TouchSensor(uint8_t sendPin, uint8_t receivePin)
+TouchSensor::TouchSensor(uint8_t sendPin, uint8_t receivePin, int _timeout)
 {
 	uint8_t sPort, rPort;
 
-	timeout = 20000;
+	timeout = _timeout;
 	
 	sBit =  digitalPinToBitMask(sendPin);			// get send pin's ports and bitmask
 	sPort = digitalPinToPort(sendPin);

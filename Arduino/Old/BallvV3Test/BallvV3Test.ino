@@ -1,14 +1,14 @@
-#include <TCOPlatform.h>
+#include <IOPlatform.h>
 
-TCOPlatform tcoPlatform;
+IOPlatform platform;
 byte lastX = 0;
 byte lastY = 0;
 byte lastZ = 0;
 
 void setup(){
-  tcoPlatform.setSendValues(&sendValues);   // Method for handling output
-  tcoPlatform.setSetState(&setState);       // Method for handling input
-  tcoPlatform.begin(4, 4);                  // Start the platform, input and output buffer size = 4
+  platform.setSendValues(&sendValues);   // Method for handling output
+  platform.setSetState(&setState);       // Method for handling input
+  platform.begin(4, 4);                  // Start the platform, input and output buffer size = 4
 }
 
 void loop(){

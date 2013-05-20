@@ -4,6 +4,9 @@
   Version 04 by Paul Stoffregen - Arduino 1.0 compatibility, issue 146 fix
   vim: set ts=4:
 */
+/*
+  Modified by Christian Olsson, Kåre Sylow and Henrik Haugboelle 2013
+*/
 
 // ensure this library description is only included once
 #ifndef TouchSensor_h
@@ -21,7 +24,7 @@ class TouchSensor
   // user-accessible "public" interface
   public:
   // methods
-	TouchSensor(uint8_t sendPin, uint8_t receivePin);
+	TouchSensor(uint8_t sendPin, uint8_t receivePin, int _timeout);
 	long read(int samples);
   // library-accessible "private" interface
   private:

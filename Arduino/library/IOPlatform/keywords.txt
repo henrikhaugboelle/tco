@@ -1,18 +1,18 @@
 #######################################
-# Syntax Coloring Map For TCOSerial
+# Syntax Coloring Map For IOPlatform
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-TCOSerial	KEYWORD1
+IOPlatform	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-readSerial	KEYWORD2
-writeSerial	KEYWORD2
+setSetState	KEYWORD2
+setSendValues	KEYWORD2
+setWait	KEYWORD2
 begin	KEYWORD2
-resetRead	KEYWORD2
