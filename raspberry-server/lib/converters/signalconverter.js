@@ -47,7 +47,7 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 		var result = [];
 
 		var acc_max = [0, 0, 0];
-		var cap_avg = 0;
+		var cap_max = 0;
 		
 		var len = this.value_sets.length;
 
@@ -59,11 +59,12 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 				if (value_set[i] > acc_max[i]) acc_max[i] = value_set[i];
 			}
 
-			cap_avg = cap_avg + parseInt(value_set[3]);
+			value_set[4] = parseInt(value_set[4]);
+			if (value_set[4] > cap_max[4]) cap_max[4] = value_set[4];
 		}
 
 		var magnitude = parser.parse(acc_max[0] + acc_max[1] + acc_max[2]);
-		var capacivity = parser.parse(cap_avg / len);
+		var capacivity = cap_max;
 
 		var states = [magnitude];
 
