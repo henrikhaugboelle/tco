@@ -60,14 +60,11 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 			}
 
 			value_set[3] = parseInt(value_set[3]);
-			console.log(value_set[3]);
 			if (value_set[3] > cap_max) cap_max = value_set[3];
 		}
 
 		var magnitude = parser.parse(acc_max[0] + acc_max[1] + acc_max[2]);
 		var capacivity = cap_max;
-		//console.log(capacivity);
-		//console.log(cap_max);
 
 		var states = [magnitude];
 
@@ -112,7 +109,7 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 			];
 
 		} else if (capacivity > this.touch) {
-			console.log("touch");
+			//console.log("touch");
 			this.still_first = true;
 
 			r_up_smoother.min = this.decay_rgb[0];
