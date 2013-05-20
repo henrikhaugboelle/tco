@@ -53,7 +53,7 @@ var SignalConverter = _.inherit(AbstractSignalConverter, {
 
 		while (this.value_sets.length > 0) {
 			var value_set = this.value_sets.pop();
-			console.log(value_set);
+			
 			for (var i = 0; i < 3; i++) {
 				value_set[i] = parseInt(value_set[i]);
 				if (value_set[i] > acc_max[i]) acc_max[i] = value_set[i];
