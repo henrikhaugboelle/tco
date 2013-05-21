@@ -1,15 +1,22 @@
+// require the os and dgram libraries
 var os = require('os'),
 	dgram = require('dgram');
 
+// utility function to convert a ip to a number 
+// that we can do comparisons on
 var ipToInt = function(ip) {
 	var d = ip.split('.');
 
 	return ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
 };
 
+// constructor of the network class. takes a object
+// of options as parameter. 
 var NetworkNode = function NetworkNode(options) {
 	var self = this;
 
+
+	// configure options and class variables
 	options = options || {};
 
 	this.dgram = options.dgram || dgram;
@@ -38,6 +45,7 @@ var NetworkNode = function NetworkNode(options) {
 	this.server = null;
 	this.local = null;
 
+	// initialize sockets
 	this.heartbeat_socket = this.dgram.createSocket('udp4');
 	this.heartbeat_socket.bind(this.HEARTBEAT_PORT, '0.0.0.0');
 
@@ -47,12 +55,14 @@ var NetworkNode = function NetworkNode(options) {
 	this.client_socket = this.dgram.createSocket('udp4');
 	this.client_socket.bind(this.CLIENT_PORT, '0.0.0.0');
 
-	// mac hack
+	// mac hack to make broadcasting work on mac.
+	// an exception is thrown on linux platforms.
 	try {
 		this.heartbeat_socket.setBroadcast(true);
 		this.client_socket.setBroadcast(true);
 	} catch (e) { }
 
+	// set the broadcast option, when sockets are initialized
 	this.heartbeat_socket.on('listening', function() {
 		self.heartbeat_socket.setBroadcast(true);
 	});
@@ -61,6 +71,9 @@ var NetworkNode = function NetworkNode(options) {
 		self.client_socket.setBroadcast(true);
 	});
 
+	// if the options did not contain an ip, inspect
+	// the os internet interfaces, to obtain the ip
+	// given to the machine
 	if (!options.ip) {
 		// get own ip
 		var interfaces = os.networkInterfaces();
@@ -82,6 +95,8 @@ var NetworkNode = function NetworkNode(options) {
 	}
 };
 
+// utility function used for debugging.
+// prints all the units that this current unit knows of.
 NetworkNode.prototype.print = function() {
 	for (var address in this.nodes) {
 		if (this.server === address) {
@@ -94,6 +109,8 @@ NetworkNode.prototype.print = function() {
 	console.log("");
 };
 
+// initialize listening for heartbeat, server, and client
+// also initialize the units own heartbeat
 NetworkNode.prototype.listen = function() {
 	this.listenOnHeartbeat();
 	this.listenOnServer();
@@ -102,6 +119,7 @@ NetworkNode.prototype.listen = function() {
 	this.startHeartbeat();
 };
 
+// remove the intervals and close the socket connections
 NetworkNode.prototype.close = function() {
 	clearInterval(this.interval_check);
 	clearInterval(this.interval_emit);
@@ -111,10 +129,15 @@ NetworkNode.prototype.close = function() {
 	this.client_socket.close();
 };
 
+// listen for heartbeats from other units remove the units 
+// form the unitlist, if they are not heartbeating anymore
 NetworkNode.prototype.listenOnHeartbeat = function() {
 	var self = this;
 
-	// listen for heartbeats
+	// when a heartbeat is received, check if we 
+	// know it already, if not, add it to the list,
+	// emit the "added" event and start an election. 
+	// increase the tick for the unit either way
 	self.heartbeat_socket.on('message', function(message, remote) {
 		if (self.nodes[remote.address] === undefined) {
 			self.nodes[remote.address] = self.tick;
@@ -129,10 +152,11 @@ NetworkNode.prototype.listenOnHeartbeat = function() {
 		}
 	});
 
-	// check if servers still exists
+	// in an interval, check if the units still exists.
+	// if a unit does not exist anymore, remove it 
+	// from the unitlist and emit the "removed" event.
+	// if the removed unit was server, start an election.
 	self.interval_check = setInterval(function() {
-		// console.log("check if servers still exist");
-		// console.log(self.nodes);
 		for (var address in self.nodes) {
 			if (self.nodes[address] < self.tick) {
 				delete self.nodes[address];
@@ -151,7 +175,8 @@ NetworkNode.prototype.listenOnHeartbeat = function() {
 	}, self.HEARTBEAT_TIMEOUT_INTERVAL);
 };
 
-// signal from clients
+// listen for messages from clients (only receives 
+// messages if the unit is server)
 NetworkNode.prototype.listenOnClient = function() {
 	var self = this;
 
@@ -162,7 +187,7 @@ NetworkNode.prototype.listenOnClient = function() {
 	});
 };
 
-// signal from server
+// listen for messages from the server
 NetworkNode.prototype.listenOnServer = function() {
 	var self = this;
 
@@ -173,6 +198,7 @@ NetworkNode.prototype.listenOnServer = function() {
 	});
 };
 
+// start the units heartbeating
 NetworkNode.prototype.startHeartbeat = function() {
 	var self = this;
 
@@ -185,10 +211,15 @@ NetworkNode.prototype.startHeartbeat = function() {
 	}, self.HEARTBEAT_INTERVAL);
 };
 
+// check if this unit is server
 NetworkNode.prototype.isServer = function() {
 	return this.local === this.server;
 };
 
+// server election. runs through all the units
+// in the unitlist and elects the one with the
+// highest ip. also emits the promoted and 
+// demoted events when necessary.
 NetworkNode.prototype.chooseServer = function() {
 	var self = this,
 		max = 0,
@@ -206,12 +237,14 @@ NetworkNode.prototype.chooseServer = function() {
 
 	this.server = addr;
 
-	// if it was not server before, but is now, then run assign
+	// if this unit was not server before, but is now, then
+	// emit the "promoted" event
 	if (oldIsServer === false && this.isServer()) {
 		for (var x in (self.callbacks['promoted'] || [])) {
 			self.callbacks['promoted'][x].call(self);
 		}
-	// if it was server before, but not now, then run deprive
+	// if this unit was server before, but is not now, then
+	// emit the "demoted" event
 	} else if (oldIsServer === true && !this.isServer()) {
 		for (var x in (self.callbacks['demoted'] || [])) {
 			self.callbacks['demoted'][x].call(self);
@@ -219,7 +252,7 @@ NetworkNode.prototype.chooseServer = function() {
 	}
 };
 
-// sendMessageToServer
+// method to send a message to the current server
 NetworkNode.prototype.sendMessageToServer = function(message) {
 	var buf = Buffer(message + "");
 	this.server_socket.send(buf, 0, buf.length, this.SERVER_PORT, this.server, function(err) {
@@ -227,7 +260,7 @@ NetworkNode.prototype.sendMessageToServer = function(message) {
 	});
 };
 
-// sendMessageToClients
+// method to send a message to all clients
 NetworkNode.prototype.sendMessageToClients = function(message) {
 	var buf = Buffer(message + "");
 	this.client_socket.send(buf, 0, buf.length, this.CLIENT_PORT, this.CLIENT_ADDRESS, function(err) {
@@ -235,6 +268,8 @@ NetworkNode.prototype.sendMessageToClients = function(message) {
 	});
 };
 
+// generic method for registering callbacks for 
+// the range of events emitted in the class.
 NetworkNode.prototype.on = function(namespace, callback) {
 	if (!this.callbacks[namespace]) {
 		this.callbacks[namespace] = [];
@@ -243,4 +278,5 @@ NetworkNode.prototype.on = function(namespace, callback) {
 	this.callbacks[namespace].push(callback);
 };
 
+// export the module
 module.exports = NetworkNode;
